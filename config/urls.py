@@ -1,3 +1,5 @@
+from django.contrib import admin
+from django.contrib.auth import views as auth_views
 from django.db import connection
 from django.db.utils import DatabaseError
 from django.http import JsonResponse
@@ -24,7 +26,23 @@ def readiness(request):
 
 
 urlpatterns = [
+    path("admin/", admin.site.urls),
     path("health/", health, name="health"),
     path("ready/", readiness, name="readiness"),
+    path(
+        "accounts/login/",
+        auth_views.LoginView.as_view(
+            template_name="registration/login.html",
+        ),
+        name="login",
+    ),
+    path(
+        "accounts/logout/",
+        auth_views.LogoutView.as_view(
+            template_name="registration/flowpilot_logged_out.html",
+        ),
+        name="logout",
+    ),
     path("webhooks/", include("webhooks.urls")),
+    path("", include("dashboard.urls")),
 ]

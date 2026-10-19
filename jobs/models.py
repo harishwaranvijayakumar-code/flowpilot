@@ -26,6 +26,7 @@ class AnalysisJob(models.Model):
     max_attempts = models.PositiveIntegerField(default=5)
     available_at = models.DateTimeField(default=timezone.now)
     lease_until = models.DateTimeField(null=True, blank=True)
+    lease_token = models.UUIDField(null=True, blank=True, editable=False)
     last_error = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -42,7 +43,10 @@ class AnalysisJob(models.Model):
                 name="analysis_job_attempts_lte_max",
             ),
             models.CheckConstraint(
-                condition=(~Q(status="running") | Q(lease_until__isnull=False)),
+                condition=(
+                    ~Q(status="running")
+                    | (Q(lease_until__isnull=False) & Q(lease_token__isnull=False))
+                ),
                 name="running_analysis_job_has_lease",
             ),
         ]

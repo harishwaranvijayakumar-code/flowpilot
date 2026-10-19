@@ -6,3 +6,4 @@ psycopg[binary]==3.2.6
 pytest==8.4.2
 pytest-django==4.11.1
 ruff==0.14.0
+ruamel.yaml==0.18.15

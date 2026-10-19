@@ -1,0 +1,18 @@
+[
+  {
+    "category": "step",
+    "change_type": "added",
+    "path": "jobs.test.steps[0]",
+    "before": null,
+    "after": {
+      "name": "Setup",
+      "id": null,
+      "uses": null,
+      "run": "echo setup",
+      "condition": null,
+      "with": {},
+      "env": {}
+    },
+    "message": "Step 0 was added to job 'test'."
+  }
+]

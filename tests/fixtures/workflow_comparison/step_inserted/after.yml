@@ -1,0 +1,12 @@
+name: CI
+on: push
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup
+        run: echo setup
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Test
+        run: pytest

@@ -1,0 +1,15 @@
+[
+  {
+    "category": "trigger_filter",
+    "change_type": "modified",
+    "path": "on.push.branches",
+    "before": [
+      "main"
+    ],
+    "after": [
+      "main",
+      "release"
+    ],
+    "message": "'on.push.branches' changed."
+  }
+]

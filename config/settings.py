@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     "dashboard.apps.DashboardConfig",
     "webhooks.apps.WebhooksConfig",
     "jobs.apps.JobsConfig",
+    "workflow_parser.apps.WorkflowParserConfig",
 ]
 
 MIDDLEWARE = [

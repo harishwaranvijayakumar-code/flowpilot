@@ -1,0 +1,10 @@
+[
+  {
+    "category": "step",
+    "change_type": "modified",
+    "path": "jobs.test.steps[0].uses",
+    "before": "actions/checkout@v4",
+    "after": "actions/checkout@v5",
+    "message": "'jobs.test.steps[0].uses' changed."
+  }
+]

@@ -1,0 +1,14 @@
+[
+  {
+    "category": "permission",
+    "change_type": "modified",
+    "path": "permissions",
+    "before": {
+      "contents": "read"
+    },
+    "after": {
+      "contents": "write"
+    },
+    "message": "'permissions' changed."
+  }
+]

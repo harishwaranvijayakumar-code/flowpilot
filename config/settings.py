@@ -8,6 +8,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
 GITHUB_WEBHOOK_SECRET = os.environ.get("GITHUB_WEBHOOK_SECRET", "")
+GITHUB_APP_ID = os.environ.get("GITHUB_APP_ID", "")
+GITHUB_APP_PRIVATE_KEY = os.environ.get("GITHUB_APP_PRIVATE_KEY", "")
+GITHUB_API_URL = os.environ.get(
+    "GITHUB_API_URL",
+    "https://api.github.com",
+)
 
 SECRET_KEY = os.environ.get(
     "DJANGO_SECRET_KEY",

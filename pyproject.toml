@@ -1,7 +1,7 @@
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "config.settings"
 python_files = ["test_*.py", "*_tests.py", "tests.py"]
-testpaths = ["tests"]
+testpaths = ["tests", "jobs"]
 addopts = "-ra"
 
 [tool.ruff]

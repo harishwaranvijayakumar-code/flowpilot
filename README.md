@@ -1,4 +1,3 @@
-
 # FlowPilot
 
 FlowPilot analyzes changes to GitHub Actions workflows, identifies potentially
@@ -7,10 +6,10 @@ validate workflow changes before merging.
 
 ## Current status
 
-Repository foundation in progress.
-
-The initial milestone establishes the Django application, PostgreSQL development
-environment, health endpoints, automated tests, and GitHub Actions CI.
+The foundation, secure webhook ingestion, durable job queue, workflow parser,
+normalizer, deterministic comparison, and initial static change-analysis rules
+are implemented. GitHub pull-request retrieval, persisted analysis reports, and
+Check Run publication remain future integration work.
 
 ## Technology stack
 
@@ -45,9 +44,11 @@ python -m pytest
 
 ## Product boundaries
 
-FlowPilot is a workflow-change analysis tool, not a CI simulator. It will analyze
-real connected repositories and pull requests. It will not execute pull-request
-scripts or claim that static analysis proves a workflow correct.
+FlowPilot statically analyzes workflow definitions and change evidence. It is not
+a CI simulator. It does not execute pull-request scripts or workflow commands,
+and static findings do not prove that a workflow is exploitable or correct.
+Findings include severity, confidence, evidence, and recommendations. Contextual
+patterns are presented for review rather than as confirmed vulnerabilities.
 
 ## Security
 

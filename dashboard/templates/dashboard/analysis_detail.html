@@ -1,0 +1,284 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f5f5f7">
+    <title>Analysis details - FlowPilot</title>
+    <link rel="stylesheet" href="{% static 'dashboard/dashboard.css' %}">
+</head>
+<body class="app-page">
+    <aside class="sidebar">
+        <a class="brand" href="{% url 'dashboard:index' %}">
+            <span class="brand-mark" aria-hidden="true">F</span>
+            <span>FlowPilot</span>
+        </a>
+
+        <p class="nav-heading">WORKSPACE</p>
+
+        <nav class="main-nav" aria-label="Main navigation">
+            <a class="nav-link" href="{% url 'dashboard:index' %}">
+                <span class="nav-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <rect x="4" y="4" width="6" height="6" rx="1.2"></rect>
+                        <rect x="14" y="4" width="6" height="6" rx="1.2"></rect>
+                        <rect x="4" y="14" width="6" height="6" rx="1.2"></rect>
+                        <rect x="14" y="14" width="6" height="6" rx="1.2"></rect>
+                    </svg>
+                </span>
+                Overview
+            </a>
+
+            <a
+                class="nav-link nav-link-active"
+                href="{% url 'dashboard:pull_requests' %}"
+                aria-current="page"
+            >
+                <span class="nav-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <circle cx="7" cy="5" r="2"></circle>
+                        <circle cx="17" cy="19" r="2"></circle>
+                        <circle cx="17" cy="5" r="2"></circle>
+                        <path d="M7 7v12M17 7v10M14 14l3 3 3-3"></path>
+                    </svg>
+                </span>
+                Pull requests
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <div class="account-card">
+                <span class="avatar" aria-hidden="true">{{ request.user.username|first|upper }}</span>
+                <div class="account-details">
+                    <span class="account-name">{{ request.user.username }}</span>
+                    <span class="account-role">Workspace member</span>
+                </div>
+            </div>
+
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button class="nav-link logout-button" type="submit">
+                    <span class="nav-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <path d="M10 17l5-5-5-5M15 12H3"></path>
+                            <path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"></path>
+                        </svg>
+                    </span>
+                    Sign out
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <div class="breadcrumb">
+                Workspace <span aria-hidden="true">/</span>
+                <a href="{% url 'dashboard:pull_requests' %}">Pull requests</a>
+                <span aria-hidden="true">/</span>
+                Analysis
+            </div>
+            <span class="connection-label">Analysis details</span>
+        </header>
+
+        <div class="page-content">
+            <section class="page-intro">
+                <p class="eyebrow">WORKFLOW ANALYSIS</p>
+                <h1>
+                    {% if pull_request_number %}
+                        Pull request #{{ pull_request_number }}
+                    {% else %}
+                        Analysis details
+                    {% endif %}
+                </h1>
+
+                <p>{{ repository.full_name }}</p>
+
+                {% if pull_request_url %}
+                    <a
+                        class="analysis-link"
+                        href="{{ pull_request_url }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >Open pull request on GitHub &rarr;</a>
+                {% endif %}
+            </section>
+
+            <section class="detail-grid" aria-label="Analysis metadata">
+                <article class="metric-card detail-metric">
+                    <span class="metric-label">Analysis status</span>
+                    <span class="status-pill {{ status_css_class }}">
+                        <span class="status-dot"></span>
+                        {{ job.get_status_display }}
+                    </span>
+                </article>
+
+                <article class="metric-card detail-metric">
+                    <span class="metric-label">Findings</span>
+                    <strong class="metric-value">{{ findings|length }}</strong>
+                </article>
+
+                <article class="metric-card detail-metric">
+                    <span class="metric-label">Attempts</span>
+                    <strong class="metric-value">{{ job.attempts }} / {{ job.max_attempts }}</strong>
+                </article>
+
+                <article class="metric-card detail-metric">
+                    <span class="metric-label">Result schema</span>
+                    <strong class="metric-value">
+                        {% if result %}
+                            v{{ result.schema_version }}
+                        {% else %}
+                            Not available
+                        {% endif %}
+                    </strong>
+                </article>
+            </section>
+
+            <section class="content-section">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">REVISION</p>
+                        <h2>Analyzed commits</h2>
+                    </div>
+                </div>
+
+                <div class="detail-panel">
+                    <div class="detail-row">
+                        <span class="detail-label">Base SHA</span>
+                        <code class="sha-value">{{ base_sha|default:"Not recorded" }}</code>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="detail-label">Head SHA</span>
+                        <code class="sha-value">{{ head_sha|default:"Not recorded" }}</code>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="detail-label">Created</span>
+                        <time datetime="{{ job.created_at|date:'c' }}">{{ job.created_at|date:"M j, Y" }} &middot; {{ job.created_at|date:"H:i:s" }}</time>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="detail-label">Last updated</span>
+                        <time datetime="{{ job.updated_at|date:'c' }}">{{ job.updated_at|date:"M j, Y" }} &middot; {{ job.updated_at|date:"H:i:s" }}</time>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">RESULT</p>
+                        <h2>Findings</h2>
+                    </div>
+                    <span class="section-count">{{ findings|length }} total</span>
+                </div>
+
+                {% if result %}
+                    {% if findings %}
+                        <div class="finding-list">
+                            {% for finding in findings %}
+                                <article class="finding-card">
+                                    <div class="finding-heading">
+                                        <div>
+                                            <span class="finding-rule">{{ finding.rule_id|default:"Workflow finding" }}</span>
+                                            <h3>{{ finding.title|default:"Untitled finding" }}</h3>
+                                        </div>
+
+                                        <span class="severity-pill severity-{{ finding.severity|default:'info'|lower }}">
+                                            {{ finding.severity|default:"Info" }}
+                                        </span>
+                                    </div>
+
+                                    {% if finding.description %}
+                                        <p>{{ finding.description }}</p>
+                                    {% endif %}
+
+                                    {% if finding.workflow_path %}
+                                        <p class="code-label">
+                                            Workflow: <code>{{ finding.workflow_path }}</code>
+                                        </p>
+                                    {% endif %}
+
+                                    {% if finding.change_status %}
+                                        <p class="code-label">Change: {{ finding.change_status }}</p>
+                                    {% endif %}
+
+                                    {% if finding.recommendation %}
+                                        <div class="recommendation">
+                                            <strong>Recommendation</strong>
+                                            <p>{{ finding.recommendation }}</p>
+                                        </div>
+                                    {% endif %}
+                                </article>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-state empty-state-compact">
+                            <h3>No findings recorded.</h3>
+                            <p>
+                                {% if result.valid %}
+                                    The analysis completed without findings.
+                                {% else %}
+                                    The analysis result is marked invalid and contains no findings.
+                                {% endif %}
+                            </p>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="empty-state empty-state-compact">
+                        <h3>Analysis result is not available yet.</h3>
+                        <p>The job may still be queued, running, or may have ended before a result was persisted.</p>
+                    </div>
+                {% endif %}
+            </section>
+
+            {% if diagnostics %}
+                <section class="content-section">
+                    <div class="section-heading">
+                        <div>
+                            <p class="eyebrow">PARSER OUTPUT</p>
+                            <h2>Diagnostics</h2>
+                        </div>
+                        <span class="section-count">{{ diagnostics|length }} total</span>
+                    </div>
+
+                    <div class="finding-list">
+                        {% for diagnostic in diagnostics %}
+                            <article class="diagnostic-card">
+                                <strong>{{ diagnostic.code|default:"Diagnostic" }}</strong>
+                                <p>{{ diagnostic.message|default:"No message supplied." }}</p>
+
+                                {% if diagnostic.workflow_path %}
+                                    <p class="code-label">
+                                        Workflow: <code>{{ diagnostic.workflow_path }}</code>
+                                    </p>
+                                {% endif %}
+                            </article>
+                        {% endfor %}
+                    </div>
+                </section>
+            {% endif %}
+
+            {% if job.last_error %}
+                <section class="content-section">
+                    <div class="section-heading">
+                        <div>
+                            <p class="eyebrow">EXECUTION</p>
+                            <h2>Last error</h2>
+                        </div>
+                    </div>
+                    <pre class="error-panel">{{ job.last_error }}</pre>
+                </section>
+            {% endif %}
+
+            <footer class="page-footer">
+                <span>FlowPilot</span>
+                <a href="{% url 'dashboard:pull_requests' %}">Back to pull requests</a>
+            </footer>
+        </div>
+    </main>
+</body>
+</html>

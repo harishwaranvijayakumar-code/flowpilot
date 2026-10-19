@@ -206,3 +206,209 @@ class DashboardTests(TestCase):
         self.assertContains(response, "Good work")
         self.assertContains(response, 'name="username"')
         self.assertContains(response, 'name="password"')
+
+
+class PullRequestAnalysisViewTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        user_model = get_user_model()
+        cls.user = user_model.objects.create_user(
+            username="pr-viewer",
+            password="test-password",
+        )
+        cls.other_user = user_model.objects.create_user(
+            username="other-pr-viewer",
+            password="test-password",
+        )
+
+        cls.installation = GitHubInstallation.objects.create(
+            installation_id=3101,
+            account_login="m9-org",
+            account_type=GitHubInstallation.AccountType.ORGANIZATION,
+        )
+        cls.other_installation = GitHubInstallation.objects.create(
+            installation_id=3102,
+            account_login="private-org",
+            account_type=GitHubInstallation.AccountType.ORGANIZATION,
+        )
+
+        cls.repository = Repository.objects.create(
+            installation=cls.installation,
+            github_repo_id=4101,
+            full_name="m9-org/workflows",
+            default_branch="main",
+            html_url="https://github.com/m9-org/workflows",
+            is_private=True,
+        )
+        cls.other_repository = Repository.objects.create(
+            installation=cls.other_installation,
+            github_repo_id=4102,
+            full_name="private-org/secret-workflows",
+            default_branch="main",
+            html_url="https://github.com/private-org/secret-workflows",
+            is_private=True,
+        )
+
+        DashboardMembership.objects.create(
+            user=cls.user,
+            repository=cls.repository,
+            role=DashboardMembership.Role.VIEWER,
+        )
+        DashboardMembership.objects.create(
+            user=cls.other_user,
+            repository=cls.other_repository,
+            role=DashboardMembership.Role.VIEWER,
+        )
+
+    def setUp(self):
+        self.client.force_login(self.user)
+
+    def create_pr_job(
+        self,
+        *,
+        repository_id=None,
+        number=42,
+        job_type="analyze_pull_request",
+        status=AnalysisJob.Status.QUEUED,
+        dedupe_key="m9-pr-job",
+    ):
+        if repository_id is None:
+            repository_id = self.repository.github_repo_id
+
+        return AnalysisJob.objects.create(
+            job_type=job_type,
+            dedupe_key=dedupe_key,
+            status=status,
+            payload={
+                "installation_id": self.installation.installation_id,
+                "repository_id": repository_id,
+                "pull_request_number": number,
+                "base_sha": "base123",
+                "head_sha": "head456",
+                "action": "opened",
+            },
+        )
+
+    def test_anonymous_user_is_redirected_from_pr_list(self):
+        self.client.logout()
+
+        response = self.client.get(reverse("dashboard:pull_requests"))
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse("login"), response.headers["Location"])
+
+    def test_pr_list_only_shows_accessible_pr_analysis_jobs(self):
+        self.create_pr_job(dedupe_key="visible-pr")
+        self.create_pr_job(
+            repository_id=self.other_repository.github_repo_id,
+            dedupe_key="hidden-pr",
+        )
+        self.create_pr_job(
+            job_type="publish_check_run",
+            dedupe_key="check-run-job",
+        )
+
+        response = self.client.get(reverse("dashboard:pull_requests"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "m9-org/workflows")
+        self.assertContains(response, "#42")
+        self.assertNotContains(response, "private-org/secret-workflows")
+        self.assertEqual(len(response.context["jobs"]), 1)
+
+    def test_pr_list_has_an_empty_state(self):
+        response = self.client.get(reverse("dashboard:pull_requests"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "No pull request analyses yet.")
+
+    def test_analysis_detail_displays_findings_and_revision_metadata(self):
+        job = self.create_pr_job(status=AnalysisJob.Status.COMPLETED)
+        WorkflowAnalysisResult.objects.create(
+            job=job,
+            valid=True,
+            findings=[
+                {
+                    "severity": "high",
+                    "rule_id": "action-unpinned",
+                    "title": "Pin third-party actions",
+                    "description": "The action uses a mutable reference.",
+                    "workflow_path": ".github/workflows/ci.yml",
+                    "recommendation": "Pin the action to a full commit SHA.",
+                },
+            ],
+            diagnostics=[
+                {
+                    "code": "workflow-parsed",
+                    "message": "Workflow parsed successfully.",
+                    "workflow_path": ".github/workflows/ci.yml",
+                },
+            ],
+        )
+
+        response = self.client.get(
+            reverse("dashboard:analysis_detail", kwargs={"job_id": job.id}),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "m9-org/workflows")
+        self.assertContains(response, "Pull request #42")
+        self.assertContains(response, "Pin third-party actions")
+        self.assertContains(response, "action-unpinned")
+        self.assertContains(response, "Pin the action to a full commit SHA.")
+        self.assertContains(response, "base123")
+        self.assertContains(response, "head456")
+        self.assertContains(
+            response,
+            "https://github.com/m9-org/workflows/pull/42",
+        )
+        self.assertContains(response, "Workflow parsed successfully.")
+
+    def test_user_cannot_view_another_users_analysis(self):
+        job = self.create_pr_job(
+            repository_id=self.other_repository.github_repo_id,
+            dedupe_key="private-analysis",
+        )
+
+        response = self.client.get(
+            reverse("dashboard:analysis_detail", kwargs={"job_id": job.id}),
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_analysis_detail_handles_missing_result(self):
+        job = self.create_pr_job(dedupe_key="missing-result")
+
+        response = self.client.get(
+            reverse("dashboard:analysis_detail", kwargs={"job_id": job.id}),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Analysis result is not available yet.")
+
+    def test_analysis_detail_ignores_malformed_json_entries(self):
+        job = self.create_pr_job(dedupe_key="malformed-result")
+        WorkflowAnalysisResult.objects.create(
+            job=job,
+            valid=False,
+            findings=[
+                "unexpected string",
+                None,
+                {
+                    "severity": "medium",
+                    "rule_id": "valid-entry",
+                    "title": "Valid finding",
+                },
+            ],
+            diagnostics=["unexpected diagnostic", {"code": "valid-diagnostic"}],
+        )
+
+        response = self.client.get(
+            reverse("dashboard:analysis_detail", kwargs={"job_id": job.id}),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Valid finding")
+        self.assertContains(response, "valid-diagnostic")
+        self.assertEqual(len(response.context["findings"]), 1)
+        self.assertEqual(len(response.context["diagnostics"]), 1)

@@ -6,6 +6,8 @@ from django.core.management.base import BaseCommand, CommandError
 
 from jobs.analysis_handler import WorkflowAnalysisOutput, analyze_workflow_payload
 from jobs.analysis_results import persist_workflow_result_and_complete
+from jobs.check_run_publishing import publish_check_run_payload
+from jobs.pull_request_analysis import analyze_pull_request_payload
 from jobs.worker import (
     claim_next_job,
     complete_job,
@@ -19,6 +21,8 @@ DEFAULT_POLL_INTERVAL = 1.0
 
 JOB_HANDLERS = {
     "workflow_analysis": lambda claim: analyze_workflow_payload(claim.payload),
+    "analyze_pull_request": lambda claim: analyze_pull_request_payload(claim.payload),
+    "publish_check_run": lambda claim: publish_check_run_payload(claim.payload),
 }
 
 

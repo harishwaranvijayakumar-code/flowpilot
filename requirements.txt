@@ -7,3 +7,6 @@ pytest==8.4.2
 pytest-django==4.11.1
 ruff==0.14.0
 ruamel.yaml==0.18.15
+
+httpx>=0.28,<1
+PyJWT[crypto]>=2.10,<3

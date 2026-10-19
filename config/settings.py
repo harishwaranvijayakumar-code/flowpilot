@@ -30,6 +30,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "github_integration.apps.GithubIntegrationConfig",
+    "dashboard.apps.DashboardConfig",
 ]
 
 MIDDLEWARE = [

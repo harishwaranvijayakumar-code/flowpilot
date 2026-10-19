@@ -7,6 +7,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv(BASE_DIR / ".env")
 
+GITHUB_WEBHOOK_SECRET = os.environ.get("GITHUB_WEBHOOK_SECRET", "")
+
 SECRET_KEY = os.environ.get(
     "DJANGO_SECRET_KEY",
     "development-only-key-change-before-deployment",
@@ -32,6 +34,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "github_integration.apps.GithubIntegrationConfig",
     "dashboard.apps.DashboardConfig",
+    "webhooks.apps.WebhooksConfig",
+    "jobs.apps.JobsConfig",
 ]
 
 MIDDLEWARE = [

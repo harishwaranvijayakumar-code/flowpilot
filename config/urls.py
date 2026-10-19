@@ -1,7 +1,7 @@
 from django.db import connection
 from django.db.utils import DatabaseError
 from django.http import JsonResponse
-from django.urls import path
+from django.urls import include, path
 
 
 def health(request):
@@ -26,4 +26,5 @@ def readiness(request):
 urlpatterns = [
     path("health/", health, name="health"),
     path("ready/", readiness, name="readiness"),
+    path("webhooks/", include("webhooks.urls")),
 ]

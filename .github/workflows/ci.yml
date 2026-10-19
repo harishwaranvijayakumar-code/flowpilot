@@ -70,5 +70,11 @@ jobs:
       - name: Apply migrations
         run: python manage.py migrate --noinput
 
+      - name: Collect static files
+        run: python manage.py collectstatic --noinput
+
+      - name: Run dashboard tests
+        run: python -m pytest dashboard/tests.py -v
+
       - name: Run tests
         run: python -m pytest

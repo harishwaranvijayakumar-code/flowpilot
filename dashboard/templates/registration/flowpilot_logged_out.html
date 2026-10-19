@@ -1,0 +1,55 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f5f5f7">
+    <meta
+        name="description"
+        content="Your FlowPilot session has ended."
+    >
+    <title>Signed out | FlowPilot</title>
+    <link rel="stylesheet" href="{% static 'dashboard/dashboard.css' %}">
+</head>
+<body class="auth-page">
+    <main class="auth-shell auth-shell-logout">
+        <section
+            class="auth-panel auth-panel-logout"
+            aria-labelledby="logout-title"
+        >
+            <a
+                class="brand auth-brand"
+                href="{% url 'login' %}"
+                aria-label="FlowPilot — sign in"
+            >
+                <span class="brand-mark" aria-hidden="true">F</span>
+                <span>FlowPilot</span>
+            </a>
+
+            <div class="auth-logout-content">
+                <p class="eyebrow">SESSION ENDED</p>
+
+                <h1 id="logout-title">You're signed out.</h1>
+
+                <p class="auth-description">
+                    Your session has ended. Sign in again whenever you're
+                    ready to return to your workspace.
+                </p>
+
+                <a
+                    class="button button-primary button-wide"
+                    href="{% url 'login' %}"
+                >
+                    Sign in to FlowPilot
+                </a>
+            </div>
+        </section>
+
+        <footer class="auth-footer auth-footer-logout">
+            <span>Your workspace, ready when you are.</span>
+        </footer>
+    </main>
+</body>
+</html>

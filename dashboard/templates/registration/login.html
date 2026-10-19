@@ -1,0 +1,80 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f5f5f7">
+    <title>Sign in — FlowPilot</title>
+    <link rel="stylesheet" href="{% static 'dashboard/dashboard.css' %}">
+</head>
+<body class="auth-page">
+    <main class="auth-shell">
+        <a class="brand" href="/" aria-label="FlowPilot home">
+            <span class="brand-mark" aria-hidden="true">F</span>
+            <span>FlowPilot</span>
+        </a>
+
+        <section class="auth-panel">
+            <p class="eyebrow">DEVELOPER WORKFLOW INTELLIGENCE</p>
+            <h1>Good work<br>starts with clarity.</h1>
+            <p class="auth-description">
+                Sign in to review your connected repositories,
+                pull request analyses, and workflow activity.
+            </p>
+
+            {% if form.errors %}
+                <div class="notice notice-error" role="alert">
+                    The username or password is incorrect.
+                    Please try again.
+                </div>
+            {% endif %}
+
+            {% if next %}
+                {% if user.is_authenticated %}
+                    <div class="notice notice-error" role="alert">
+                        Your account does not have access to that page.
+                    </div>
+                {% endif %}
+            {% endif %}
+
+            <form method="post" action="{% url 'login' %}" class="auth-form">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ next|default:'/' }}">
+
+                <label for="id_username">Username</label>
+                <input
+                    id="id_username"
+                    name="username"
+                    type="text"
+                    autocomplete="username"
+                    required
+                    autofocus
+                >
+
+                <label for="id_password">Password</label>
+                <input
+                    id="id_password"
+                    name="password"
+                    type="password"
+                    autocomplete="current-password"
+                    required
+                >
+
+                <button class="button button-primary button-wide" type="submit">
+                    Sign in
+                    <span aria-hidden="true">→</span>
+                </button>
+            </form>
+
+            <p class="auth-footnote">
+                Access is managed by your FlowPilot administrator.
+            </p>
+        </section>
+
+        <footer class="auth-footer">
+            FlowPilot <span aria-hidden="true">·</span> Built for thoughtful engineering
+        </footer>
+    </main>
+</body>
+</html>

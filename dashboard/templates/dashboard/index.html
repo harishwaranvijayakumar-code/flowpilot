@@ -1,0 +1,259 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f5f5f7">
+    <title>Overview — FlowPilot</title>
+    <link rel="stylesheet" href="{% static 'dashboard/dashboard.css' %}">
+</head>
+<body class="app-page">
+    <aside class="sidebar">
+        <a class="brand" href="{% url 'dashboard:index' %}">
+            <span class="brand-mark" aria-hidden="true">F</span>
+            <span>FlowPilot</span>
+        </a>
+
+        <p class="nav-heading">WORKSPACE</p>
+        <nav class="main-nav" aria-label="Main navigation">
+            <a class="nav-link nav-link-active" href="{% url 'dashboard:index' %}">
+                <span class="nav-icon" aria-hidden="true">◫</span>
+                Overview
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <div class="account-card">
+                <span class="avatar" aria-hidden="true">
+                    {{ request.user.username|first|upper }}
+                </span>
+                <div class="account-details">
+                    <span class="account-name">{{ request.user.username }}</span>
+                    <span class="account-role">Workspace member</span>
+                </div>
+            </div>
+
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button class="nav-link logout-button" type="submit">
+                    <span class="nav-icon" aria-hidden="true">↗</span>
+                    Sign out
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <div class="breadcrumb">
+                Workspace <span aria-hidden="true">/</span> Overview
+            </div>
+            <span class="connection-label">
+                <span class="status-dot status-dot-neutral"></span>
+                Repository workspace
+            </span>
+        </header>
+
+        <div class="page-content">
+            <section class="page-intro">
+                <p class="eyebrow">YOUR WORKSPACE</p>
+                <h1>Good engineering<br class="desktop-break"> starts here.</h1>
+                <p class="page-description">
+                    A clear view of your repositories, pull request
+                    analysis, and background activity.
+                </p>
+            </section>
+
+            <section class="metrics-grid" aria-label="Workspace summary">
+                <article class="metric-card">
+                    <span class="metric-label">Repositories</span>
+                    <strong class="metric-value">{{ repository_count }}</strong>
+                    <span class="metric-caption">Active and accessible</span>
+                </article>
+
+                <article class="metric-card">
+                    <span class="metric-label">Analyses</span>
+                    <strong class="metric-value">{{ job_counts.total }}</strong>
+                    <span class="metric-caption">Tracked workflow jobs</span>
+                </article>
+
+                <article class="metric-card">
+                    <span class="metric-label">In progress</span>
+                    <strong class="metric-value">{{ job_counts.queued|add:job_counts.running|add:job_counts.retrying }}</strong>
+                    <span class="metric-caption">Queued, running, or retrying</span>
+                </article>
+
+                <article class="metric-card">
+                    <span class="metric-label">Findings</span>
+                    <strong class="metric-value">{{ findings_count }}</strong>
+                    <span class="metric-caption">Recorded analysis findings</span>
+                </article>
+            </section>
+
+            <section class="content-section">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">CONNECTED CODE</p>
+                        <h2>Your repositories</h2>
+                    </div>
+                    <span class="section-count">
+                        {{ repository_count }}
+                        {% if repository_count == 1 %}repository{% else %}repositories{% endif %}
+                    </span>
+                </div>
+
+                {% if repositories %}
+                    <div class="table-shell">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Repository</th>
+                                    <th scope="col">Default branch</th>
+                                    <th scope="col">Visibility</th>
+                                    <th scope="col">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for repository in repositories %}
+                                    <tr>
+                                        <td>
+                                            <div class="repository-cell">
+                                                <span class="repo-mark" aria-hidden="true">⌘</span>
+                                                <div>
+                                                    <span class="repository-name">
+                                                        {{ repository.full_name }}
+                                                    </span>
+                                                    <span class="repository-subtitle">
+                                                        {{ repository.installation.account_login }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="branch-label">
+                                                {{ repository.default_branch|default:"Not set" }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% if repository.is_private %}
+                                                Private
+                                            {% else %}
+                                                Public
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="status-pill status-success">
+                                                <span class="status-dot"></span>
+                                                Active
+                                            </span>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <span class="empty-state-icon" aria-hidden="true">⌘</span>
+                        <h3>Your workspace starts here.</h3>
+                        <p>
+                            No active repositories are assigned to your account yet.
+                            Ask your administrator to connect a repository and grant
+                            you access.
+                        </p>
+                    </div>
+                {% endif %}
+            </section>
+
+            <section class="content-section">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">LIVE WORKFLOW</p>
+                        <h2>Recent activity</h2>
+                    </div>
+                    <span class="section-count">Latest 10 jobs</span>
+                </div>
+
+                {% if recent_jobs %}
+                    <div class="table-shell">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Workflow</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Created</th>
+                                    <th scope="col">Attempts</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for job in recent_jobs %}
+                                    <tr>
+                                        <td>
+                                            <div class="job-cell">
+                                                <span class="job-name">
+                                                    {{ job.get_job_type_display|default:job.job_type }}
+                                                </span>
+                                                <span class="job-id">
+                                                    {{ job.id|truncatechars:14 }}
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {% if job.status == "completed" %}
+                                                <span class="status-pill status-success">
+                                                    <span class="status-dot"></span>
+                                                    Completed
+                                                </span>
+                                            {% elif job.status == "failed" %}
+                                                <span class="status-pill status-error">
+                                                    <span class="status-dot"></span>
+                                                    Failed
+                                                </span>
+                                            {% elif job.status == "running" %}
+                                                <span class="status-pill status-running">
+                                                    <span class="status-dot"></span>
+                                                    Running
+                                                </span>
+                                            {% elif job.status == "retry_wait" %}
+                                                <span class="status-pill status-warning">
+                                                    <span class="status-dot"></span>
+                                                    Retry pending
+                                                </span>
+                                            {% else %}
+                                                <span class="status-pill status-neutral">
+                                                    <span class="status-dot"></span>
+                                                    Queued
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <time datetime="{{ job.created_at|date:'c' }}">
+                                                {{ job.created_at|date:"M j, Y · H:i" }}
+                                            </time>
+                                        </td>
+                                        <td>{{ job.attempts }} / {{ job.max_attempts }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="empty-state empty-state-compact">
+                        <h3>No workflow activity yet.</h3>
+                        <p>
+                            Recent analysis jobs will appear here once
+                            your repositories start processing pull requests.
+                        </p>
+                    </div>
+                {% endif %}
+            </section>
+
+            <footer class="page-footer">
+                <span>FlowPilot</span>
+                <span>Clarity for every pull request.</span>
+            </footer>
+        </div>
+    </main>
+</body>
+</html>

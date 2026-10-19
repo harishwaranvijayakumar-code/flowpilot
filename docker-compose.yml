@@ -1,0 +1,46 @@
+
+services:
+  postgres:
+    image: postgres:17
+    container_name: flowpilot-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-flowpilot}
+      POSTGRES_USER: ${POSTGRES_USER:-flowpilot}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-local-development-password}
+    ports:
+      - "5433:5432"
+    volumes:
+      - flowpilot_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  web:
+    build: .
+    container_name: flowpilot-web
+    command: >
+      python manage.py runserver 0.0.0.0:8000
+    environment:
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-local-development-secret}
+      DJANGO_DEBUG: "true"
+      DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1
+      DB_ENGINE: postgres
+      POSTGRES_DB: ${POSTGRES_DB:-flowpilot}
+      POSTGRES_USER: ${POSTGRES_USER:-flowpilot}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-local-development-password}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  flowpilot_postgres_data:

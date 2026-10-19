@@ -1,0 +1,8 @@
+Django==5.2.18
+gunicorn==23.0.0
+whitenoise==6.9.0
+python-dotenv==1.0.1
+psycopg[binary]==3.2.6
+pytest==8.4.2
+pytest-django==4.11.1
+ruff==0.14.0

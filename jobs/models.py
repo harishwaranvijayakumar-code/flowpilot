@@ -63,3 +63,25 @@ class AnalysisJob(models.Model):
 
     def __str__(self) -> str:
         return f"{self.job_type}:{self.id} ({self.status})"
+
+
+class WorkflowAnalysisResult(models.Model):
+    """Persist the output of a workflow-analysis job separately from its input."""
+
+    job = models.OneToOneField(
+        AnalysisJob,
+        on_delete=models.CASCADE,
+        related_name="workflow_result",
+    )
+    schema_version = models.PositiveSmallIntegerField(default=1)
+    valid = models.BooleanField()
+    findings = models.JSONField(default=list)
+    diagnostics = models.JSONField(default=list)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["created_at"]
+
+    def __str__(self) -> str:
+        return f"Workflow analysis result for {self.job_id}"

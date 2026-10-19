@@ -4,6 +4,8 @@ import threading
 
 from django.core.management.base import BaseCommand, CommandError
 
+from jobs.analysis_handler import WorkflowAnalysisOutput, analyze_workflow_payload
+from jobs.analysis_results import persist_workflow_result_and_complete
 from jobs.worker import (
     claim_next_job,
     complete_job,
@@ -15,33 +17,56 @@ logger = logging.getLogger(__name__)
 
 DEFAULT_POLL_INTERVAL = 1.0
 
-# Register job handlers here as the analysis implementation is built.
-# A handler must accept a ClaimedJob and raise an exception on failure.
-JOB_HANDLERS = {}
+JOB_HANDLERS = {
+    "workflow_analysis": lambda claim: analyze_workflow_payload(claim.payload),
+}
 
 
 def process_claimed_job(claim):
-    """Execute a claimed job without treating unsupported jobs as successful."""
+    """Execute a claimed job and preserve its lease guarantees."""
     handler = JOB_HANDLERS.get(claim.job_type)
 
     if handler is None:
         message = f"No handler registered for job type: {claim.job_type}"
         fail_job(claim, message, retryable=False)
-        logger.error(
-            "Job %s failed: %s",
-            claim.job_id,
-            message,
-        )
+        logger.error("Job %s failed: %s", claim.job_id, message)
         return
 
     try:
-        handler(claim)
+        outcome = handler(claim)
     except Exception as exc:
         logger.exception("Job %s failed during processing", claim.job_id)
         fail_job(claim, str(exc), retryable=True)
         return
 
-    if not complete_job(claim):
+    if isinstance(outcome, WorkflowAnalysisOutput):
+        try:
+            completed = persist_workflow_result_and_complete(claim, outcome)
+        except Exception as exc:
+            logger.exception(
+                "Job %s failed while persisting its analysis result",
+                claim.job_id,
+            )
+            try:
+                failed = fail_job(claim, str(exc), retryable=True)
+            except Exception:
+                logger.exception(
+                    "Could not schedule retry for job %s",
+                    claim.job_id,
+                )
+                return
+
+            if not failed:
+                logger.warning(
+                    "Job %s could not be scheduled for retry because "
+                    "its lease is no longer valid",
+                    claim.job_id,
+                )
+            return
+    else:
+        completed = complete_job(claim)
+
+    if not completed:
         logger.warning(
             "Job %s could not be completed because its lease is no longer valid",
             claim.job_id,

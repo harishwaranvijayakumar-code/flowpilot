@@ -1,3 +1,4 @@
+
 FROM python:3.13-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -16,11 +17,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# Collect static files without requiring a live database.
 RUN DJANGO_DEBUG=true \
     DJANGO_SECRET_KEY=build-only-placeholder \
     python manage.py collectstatic --noinput
 
 EXPOSE 10000
 
-CMD ["sh", "-c", "gunicorn config.wsgi:application --bind 0.0.0.0:${PORT:-10000}"]
+CMD ["sh", "/app/start.sh"]

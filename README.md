@@ -53,3 +53,4 @@ scripts or claim that static analysis proves a workflow correct.
 
 Never commit `.env`, GitHub tokens, application private keys, or production
 credentials.
+Testing FlowPilot pull request webhook integration.

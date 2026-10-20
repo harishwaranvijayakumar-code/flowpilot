@@ -23,6 +23,15 @@
                 pull request analyses, and workflow activity.
             </p>
 
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="notice {% if message.tags == 'error' %}notice-error{% endif %}"
+                         role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
             {% if form.errors %}
                 <div class="notice notice-error" role="alert">
                     The username or password is incorrect.
@@ -30,13 +39,23 @@
                 </div>
             {% endif %}
 
-            {% if next %}
-                {% if user.is_authenticated %}
-                    <div class="notice notice-error" role="alert">
-                        Your account does not have access to that page.
-                    </div>
-                {% endif %}
+            {% if next and user.is_authenticated %}
+                <div class="notice notice-error" role="alert">
+                    Your account does not have access to that page.
+                </div>
             {% endif %}
+
+            <a
+                class="button button-primary button-wide"
+                href="{% url 'github_oauth_start' %}{% if next %}?next={{ next|urlencode }}{% endif %}"
+            >
+                Continue with GitHub
+                <span aria-hidden="true">→</span>
+            </a>
+
+            <p class="auth-description" style="text-align:center; margin: 1.25rem 0;">
+                Or sign in with your FlowPilot credentials
+            </p>
 
             <form method="post" action="{% url 'login' %}" class="auth-form">
                 {% csrf_token %}
@@ -68,7 +87,7 @@
             </form>
 
             <p class="auth-footnote">
-                Access is managed by your FlowPilot administrator.
+                Access to repositories is managed separately from sign-in.
             </p>
         </section>
 

@@ -5,6 +5,8 @@ from django.db.utils import DatabaseError
 from django.http import JsonResponse
 from django.urls import include, path
 
+from github_integration import views as github_views
+
 
 def health(request):
     return JsonResponse({"status": "ok"})
@@ -44,5 +46,15 @@ urlpatterns = [
         name="logout",
     ),
     path("webhooks/", include("webhooks.urls")),
+    path(
+        "accounts/github/",
+        github_views.github_oauth_start,
+        name="github_oauth_start",
+    ),
+    path(
+        "accounts/github/callback/",
+        github_views.github_oauth_callback,
+        name="github_oauth_callback",
+    ),
     path("", include("dashboard.urls")),
 ]

@@ -1,5 +1,4 @@
-﻿
-{% load static %}
+﻿{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,6 +8,7 @@
     <meta name="description" content="Repository activity and workflow analysis in FlowPilot.">
     <title>Overview - FlowPilot</title>
     <link rel="stylesheet" href="{% static 'dashboard/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'dashboard/flowpilot-design-system.css' %}">
 </head>
 <body class="app-page">
     <aside class="sidebar">
@@ -20,11 +20,9 @@
         <p class="nav-heading">WORKSPACE</p>
 
         <nav class="main-nav" aria-label="Main navigation">
-            <a
-                class="nav-link nav-link-active"
-                href="{% url 'dashboard:index' %}"
-                aria-current="page"
-            >
+            <a class="nav-link nav-link-active"
+               href="{% url 'dashboard:index' %}"
+               aria-current="page">
                 <span class="nav-icon" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none">
                         <rect x="4" y="4" width="6" height="6" rx="1.2"></rect>
@@ -36,10 +34,8 @@
                 Overview
             </a>
 
-            <a
-                class="nav-link"
-                href="{% url 'dashboard:pull_requests' %}"
-            >
+            <a class="nav-link"
+               href="{% url 'dashboard:pull_requests' %}">
                 <span class="nav-icon" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none">
                         <circle cx="7" cy="5" r="2"></circle>
@@ -52,10 +48,8 @@
             </a>
 
             {% if can_manage_repositories %}
-                <a
-                    class="nav-link"
-                    href="{% url 'dashboard:repository_access' %}"
-                >
+                <a class="nav-link"
+                   href="{% url 'dashboard:repository_access' %}">
                     <span class="nav-icon" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none">
                             <circle cx="9" cy="8" r="3"></circle>
@@ -125,10 +119,8 @@
 
                 {% if can_manage_repositories %}
                     <p>
-                        <a
-                            class="analysis-link"
-                            href="{% url 'dashboard:repository_access' %}"
-                        >
+                        <a class="analysis-link"
+                           href="{% url 'dashboard:repository_access' %}">
                             Manage repository access &rarr;
                         </a>
                     </p>
@@ -137,10 +129,8 @@
 
             {% if messages %}
                 {% for message in messages %}
-                    <div
-                        class="notice {% if message.tags == 'error' %}notice-error{% endif %}"
-                        role="status"
-                    >
+                    <div class="notice {% if message.tags == 'error' %}notice-error{% endif %}"
+                         role="status">
                         {{ message }}
                     </div>
                 {% endfor %}
@@ -165,11 +155,15 @@
                     <span class="metric-caption">Queued, running, or retrying</span>
                 </article>
 
-                <article class="metric-card">
-                    <span class="metric-label">Findings</span>
-                    <strong class="metric-value">{{ findings_count }}</strong>
-                    <span class="metric-caption">Recorded analysis findings</span>
-                </article>
+                <a class="metric-card-link"
+                   href="{% url 'dashboard:pull_requests' %}"
+                   aria-label="View pull request analyses and their findings">
+                    <article class="metric-card">
+                        <span class="metric-label">Findings</span>
+                        <strong class="metric-value">{{ findings_count }}</strong>
+                        <span class="metric-caption">View analysis results and findings</span>
+                    </article>
+                </a>
             </section>
 
             <section class="content-section">
@@ -248,16 +242,13 @@
                 {% else %}
                     <div class="empty-state">
                         <span class="empty-state-icon" aria-hidden="true">
-                            <svg
-                                viewBox="0 0 24 24"
-                                width="22"
-                                height="22"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="1.5"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            >
+                            <svg viewBox="0 0 24 24"
+                                 width="22" height="22"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 stroke-width="1.5"
+                                 stroke-linecap="round"
+                                 stroke-linejoin="round">
                                 <path d="M7 3h7l5 5v13H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"></path>
                                 <path d="M14 3v5h5"></path>
                                 <path d="M9 13h6M9 17h6"></path>
@@ -277,10 +268,8 @@
                         </p>
 
                         {% if can_manage_repositories %}
-                            <a
-                                class="analysis-link"
-                                href="{% url 'dashboard:repository_access' %}"
-                            >
+                            <a class="analysis-link"
+                               href="{% url 'dashboard:repository_access' %}">
                                 Manage repository access &rarr;
                             </a>
                         {% endif %}
@@ -382,5 +371,7 @@
             </footer>
         </div>
     </main>
+
+    <script src="{% static 'dashboard/flowpilot-ui.js' %}" defer></script>
 </body>
 </html>

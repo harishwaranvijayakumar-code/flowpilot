@@ -7,6 +7,7 @@
     <meta name="theme-color" content="#f5f5f7">
     <title>Analysis details - FlowPilot</title>
     <link rel="stylesheet" href="{% static 'dashboard/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'dashboard/flowpilot-design-system.css' %}">
 </head>
 <body class="app-page">
     <aside class="sidebar">
@@ -30,11 +31,9 @@
                 Overview
             </a>
 
-            <a
-                class="nav-link nav-link-active"
-                href="{% url 'dashboard:pull_requests' %}"
-                aria-current="page"
-            >
+            <a class="nav-link nav-link-active"
+               href="{% url 'dashboard:pull_requests' %}"
+               aria-current="page">
                 <span class="nav-icon" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none">
                         <circle cx="7" cy="5" r="2"></circle>
@@ -45,11 +44,28 @@
                 </span>
                 Pull requests
             </a>
+
+            {% if can_manage_repositories %}
+                <a class="nav-link"
+                   href="{% url 'dashboard:repository_access' %}">
+                    <span class="nav-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <circle cx="9" cy="8" r="3"></circle>
+                            <path d="M3.5 19a5.5 5.5 0 0 1 11 0"></path>
+                            <path d="M16 11h5M18.5 8.5v5"></path>
+                        </svg>
+                    </span>
+                    Repository access
+                </a>
+            {% endif %}
         </nav>
 
         <div class="sidebar-bottom">
             <div class="account-card">
-                <span class="avatar" aria-hidden="true">{{ request.user.username|first|upper }}</span>
+                <span class="avatar" aria-hidden="true">
+                    {{ request.user.username|first|upper }}
+                </span>
+
                 <div class="account-details">
                     <span class="account-name">{{ request.user.username }}</span>
                     <span class="account-role">Workspace member</span>
@@ -74,7 +90,8 @@
     <main class="main-content">
         <header class="topbar">
             <div class="breadcrumb">
-                Workspace <span aria-hidden="true">/</span>
+                Workspace
+                <span aria-hidden="true">/</span>
                 <a href="{% url 'dashboard:pull_requests' %}">Pull requests</a>
                 <span aria-hidden="true">/</span>
                 Analysis
@@ -85,6 +102,7 @@
         <div class="page-content">
             <section class="page-intro">
                 <p class="eyebrow">WORKFLOW ANALYSIS</p>
+
                 <h1>
                     {% if pull_request_number %}
                         Pull request #{{ pull_request_number }}
@@ -96,12 +114,12 @@
                 <p>{{ repository.full_name }}</p>
 
                 {% if pull_request_url %}
-                    <a
-                        class="analysis-link"
-                        href="{{ pull_request_url }}"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >Open pull request on GitHub &rarr;</a>
+                    <a class="analysis-link"
+                       href="{{ pull_request_url }}"
+                       target="_blank"
+                       rel="noopener noreferrer">
+                        Open pull request on GitHub &rarr;
+                    </a>
                 {% endif %}
             </section>
 
@@ -121,7 +139,9 @@
 
                 <article class="metric-card detail-metric">
                     <span class="metric-label">Attempts</span>
-                    <strong class="metric-value">{{ job.attempts }} / {{ job.max_attempts }}</strong>
+                    <strong class="metric-value">
+                        {{ job.attempts }} / {{ job.max_attempts }}
+                    </strong>
                 </article>
 
                 <article class="metric-card detail-metric">
@@ -157,17 +177,21 @@
 
                     <div class="detail-row">
                         <span class="detail-label">Created</span>
-                        <time datetime="{{ job.created_at|date:'c' }}">{{ job.created_at|date:"M j, Y" }} &middot; {{ job.created_at|date:"H:i:s" }}</time>
+                        <time datetime="{{ job.created_at|date:'c' }}">
+                            {{ job.created_at|date:"M j, Y" }} &middot; {{ job.created_at|date:"H:i:s" }}
+                        </time>
                     </div>
 
                     <div class="detail-row">
                         <span class="detail-label">Last updated</span>
-                        <time datetime="{{ job.updated_at|date:'c' }}">{{ job.updated_at|date:"M j, Y" }} &middot; {{ job.updated_at|date:"H:i:s" }}</time>
+                        <time datetime="{{ job.updated_at|date:'c' }}">
+                            {{ job.updated_at|date:"M j, Y" }} &middot; {{ job.updated_at|date:"H:i:s" }}
+                        </time>
                     </div>
                 </div>
             </section>
 
-            <section class="content-section">
+            <section class="content-section" id="findings">
                 <div class="section-heading">
                     <div>
                         <p class="eyebrow">RESULT</p>
@@ -183,7 +207,9 @@
                                 <article class="finding-card">
                                     <div class="finding-heading">
                                         <div>
-                                            <span class="finding-rule">{{ finding.rule_id|default:"Workflow finding" }}</span>
+                                            <span class="finding-rule">
+                                                {{ finding.rule_id|default:"Workflow finding" }}
+                                            </span>
                                             <h3>{{ finding.title|default:"Untitled finding" }}</h3>
                                         </div>
 
@@ -198,12 +224,15 @@
 
                                     {% if finding.workflow_path %}
                                         <p class="code-label">
-                                            Workflow: <code>{{ finding.workflow_path }}</code>
+                                            Workflow:
+                                            <code>{{ finding.workflow_path }}</code>
                                         </p>
                                     {% endif %}
 
                                     {% if finding.change_status %}
-                                        <p class="code-label">Change: {{ finding.change_status }}</p>
+                                        <p class="code-label">
+                                            Change: {{ finding.change_status }}
+                                        </p>
                                     {% endif %}
 
                                     {% if finding.recommendation %}
@@ -230,13 +259,16 @@
                 {% else %}
                     <div class="empty-state empty-state-compact">
                         <h3>Analysis result is not available yet.</h3>
-                        <p>The job may still be queued, running, or may have ended before a result was persisted.</p>
+                        <p>
+                            The job may still be queued, running, or may have
+                            ended before a result was persisted.
+                        </p>
                     </div>
                 {% endif %}
             </section>
 
             {% if diagnostics %}
-                <section class="content-section">
+                <section class="content-section" id="diagnostics">
                     <div class="section-heading">
                         <div>
                             <p class="eyebrow">PARSER OUTPUT</p>
@@ -253,7 +285,8 @@
 
                                 {% if diagnostic.workflow_path %}
                                     <p class="code-label">
-                                        Workflow: <code>{{ diagnostic.workflow_path }}</code>
+                                        Workflow:
+                                        <code>{{ diagnostic.workflow_path }}</code>
                                     </p>
                                 {% endif %}
                             </article>
@@ -263,22 +296,27 @@
             {% endif %}
 
             {% if job.last_error %}
-                <section class="content-section">
+                <section class="content-section" id="execution-error">
                     <div class="section-heading">
                         <div>
                             <p class="eyebrow">EXECUTION</p>
                             <h2>Last error</h2>
                         </div>
                     </div>
+
                     <pre class="error-panel">{{ job.last_error }}</pre>
                 </section>
             {% endif %}
 
             <footer class="page-footer">
                 <span>FlowPilot</span>
-                <a href="{% url 'dashboard:pull_requests' %}">Back to pull requests</a>
+                <a href="{% url 'dashboard:pull_requests' %}">
+                    Back to pull requests
+                </a>
             </footer>
         </div>
     </main>
+
+    <script src="{% static 'dashboard/flowpilot-ui.js' %}" defer></script>
 </body>
 </html>

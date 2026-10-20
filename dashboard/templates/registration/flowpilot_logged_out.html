@@ -11,7 +11,9 @@
         content="Your FlowPilot session has ended."
     >
     <title>Signed out | FlowPilot</title>
+
     <link rel="stylesheet" href="{% static 'dashboard/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'dashboard/flowpilot-design-system.css' %}">
 </head>
 <body class="auth-page">
     <main class="auth-shell auth-shell-logout">
@@ -51,5 +53,7 @@
             <span>Your workspace, ready when you are.</span>
         </footer>
     </main>
+
+    <script src="{% static 'dashboard/flowpilot-ui.js' %}" defer></script>
 </body>
 </html>

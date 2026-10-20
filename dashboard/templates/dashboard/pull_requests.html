@@ -7,6 +7,7 @@
     <meta name="theme-color" content="#f5f5f7">
     <title>Pull Requests - FlowPilot</title>
     <link rel="stylesheet" href="{% static 'dashboard/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'dashboard/flowpilot-design-system.css' %}">
 </head>
 <body class="app-page">
     <aside class="sidebar">
@@ -30,11 +31,9 @@
                 Overview
             </a>
 
-            <a
-                class="nav-link nav-link-active"
-                href="{% url 'dashboard:pull_requests' %}"
-                aria-current="page"
-            >
+            <a class="nav-link nav-link-active"
+               href="{% url 'dashboard:pull_requests' %}"
+               aria-current="page">
                 <span class="nav-icon" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none">
                         <circle cx="7" cy="5" r="2"></circle>
@@ -45,11 +44,28 @@
                 </span>
                 Pull requests
             </a>
+
+            {% if can_manage_repositories %}
+                <a class="nav-link"
+                   href="{% url 'dashboard:repository_access' %}">
+                    <span class="nav-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <circle cx="9" cy="8" r="3"></circle>
+                            <path d="M3.5 19a5.5 5.5 0 0 1 11 0"></path>
+                            <path d="M16 11h5M18.5 8.5v5"></path>
+                        </svg>
+                    </span>
+                    Repository access
+                </a>
+            {% endif %}
         </nav>
 
         <div class="sidebar-bottom">
             <div class="account-card">
-                <span class="avatar" aria-hidden="true">{{ request.user.username|first|upper }}</span>
+                <span class="avatar" aria-hidden="true">
+                    {{ request.user.username|first|upper }}
+                </span>
+
                 <div class="account-details">
                     <span class="account-name">{{ request.user.username }}</span>
                     <span class="account-role">Workspace member</span>
@@ -107,21 +123,22 @@
                                     <th scope="col">Created</th>
                                 </tr>
                             </thead>
+
                             <tbody>
                                 {% for job in jobs %}
                                     <tr>
                                         <td>
-                                            <a
-                                                class="analysis-link"
-                                                href="{% url 'dashboard:analysis_detail' job_id=job.id %}"
-                                            >
+                                            <a class="analysis-link"
+                                               href="{% url 'dashboard:analysis_detail' job_id=job.id %}">
                                                 {% if job.pull_request_number %}
                                                     #{{ job.pull_request_number }}
                                                 {% else %}
                                                     Analysis details
                                                 {% endif %}
                                             </a>
-                                            <div class="job-id">{{ job.id|truncatechars:14 }}</div>
+                                            <div class="job-id">
+                                                {{ job.id|truncatechars:14 }}
+                                            </div>
                                         </td>
 
                                         <td>
@@ -139,10 +156,19 @@
                                             </span>
                                         </td>
 
-                                        <td>{{ job.finding_count }}</td>
+                                        <td>
+                                            <a class="analysis-link"
+                                               href="{% url 'dashboard:analysis_detail' job_id=job.id %}"
+                                               aria-label="View {{ job.finding_count }} findings for this analysis">
+                                                {{ job.finding_count }}
+                                                <span class="visually-hidden"> findings; view analysis</span>
+                                            </a>
+                                        </td>
 
                                         <td>
-                                            <time datetime="{{ job.created_at|date:'c' }}">{{ job.created_at|date:"M j, Y" }} &middot; {{ job.created_at|date:"H:i" }}</time>
+                                            <time datetime="{{ job.created_at|date:'c' }}">
+                                                {{ job.created_at|date:"M j, Y" }} &middot; {{ job.created_at|date:"H:i" }}
+                                            </time>
                                         </td>
                                     </tr>
                                 {% endfor %}
@@ -152,7 +178,10 @@
                 {% else %}
                     <div class="empty-state">
                         <h3>No pull request analyses yet.</h3>
-                        <p>When FlowPilot processes a pull request in an accessible repository, its analysis will appear here.</p>
+                        <p>
+                            When FlowPilot processes a pull request in an accessible
+                            repository, its analysis will appear here.
+                        </p>
                     </div>
                 {% endif %}
             </section>
@@ -163,5 +192,7 @@
             </footer>
         </div>
     </main>
+
+    <script src="{% static 'dashboard/flowpilot-ui.js' %}" defer></script>
 </body>
 </html>

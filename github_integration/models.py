@@ -1,6 +1,44 @@
+from django.conf import settings
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import Q
+
+
+class GitHubIdentity(models.Model):
+    """Link a FlowPilot user to a stable GitHub account identity."""
+
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="github_identity",
+    )
+    github_user_id = models.BigIntegerField(
+        unique=True,
+        validators=[MinValueValidator(1)],
+    )
+    login = models.CharField(max_length=255)
+    avatar_url = models.URLField(max_length=500, blank=True)
+    html_url = models.URLField(max_length=500, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["login"]
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(github_user_id__gt=0),
+                name="github_identity_user_id_positive",
+            ),
+        ]
+        indexes = [
+            models.Index(
+                fields=["login"],
+                name="github_identity_login_idx",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.login} (GitHub ID: {self.github_user_id})"
 
 
 class GitHubInstallation(models.Model):

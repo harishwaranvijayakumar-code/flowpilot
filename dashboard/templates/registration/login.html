@@ -1,3 +1,4 @@
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -5,8 +6,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#f5f5f7">
+    <meta
+        name="description"
+        content="Sign in to FlowPilot to review repository analyses and developer workflow activity."
+    >
     <title>Sign in — FlowPilot</title>
+
     <link rel="stylesheet" href="{% static 'dashboard/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'dashboard/flowpilot-design-system.css' %}">
 </head>
 <body class="auth-page">
     <main class="auth-shell">
@@ -15,9 +22,11 @@
             <span>FlowPilot</span>
         </a>
 
-        <section class="auth-panel">
+        <section class="auth-panel" aria-labelledby="login-title">
             <p class="eyebrow">DEVELOPER WORKFLOW INTELLIGENCE</p>
-            <h1>Good work<br>starts with clarity.</h1>
+
+            <h1 id="login-title">Good work<br>starts with clarity.</h1>
+
             <p class="auth-description">
                 Sign in to review your connected repositories,
                 pull request analyses, and workflow activity.
@@ -25,8 +34,10 @@
 
             {% if messages %}
                 {% for message in messages %}
-                    <div class="notice {% if message.tags == 'error' %}notice-error{% endif %}"
-                         role="alert">
+                    <div
+                        class="notice {% if message.tags == 'error' %}notice-error{% endif %}"
+                        role="alert"
+                    >
                         {{ message }}
                     </div>
                 {% endfor %}
@@ -53,13 +64,25 @@
                 <span aria-hidden="true">→</span>
             </a>
 
-            <p class="auth-description" style="text-align:center; margin: 1.25rem 0;">
+            <p
+                class="auth-description"
+                style="text-align: center; margin: 1.25rem 0;"
+            >
                 Or sign in with your FlowPilot credentials
             </p>
 
-            <form method="post" action="{% url 'login' %}" class="auth-form">
+            <form
+                method="post"
+                action="{% url 'login' %}"
+                class="auth-form"
+            >
                 {% csrf_token %}
-                <input type="hidden" name="next" value="{{ next|default:'/' }}">
+
+                <input
+                    type="hidden"
+                    name="next"
+                    value="{{ next|default:'/' }}"
+                >
 
                 <label for="id_username">Username</label>
                 <input
@@ -80,7 +103,10 @@
                     required
                 >
 
-                <button class="button button-primary button-wide" type="submit">
+                <button
+                    class="button button-primary button-wide"
+                    type="submit"
+                >
                     Sign in
                     <span aria-hidden="true">→</span>
                 </button>
@@ -92,8 +118,12 @@
         </section>
 
         <footer class="auth-footer">
-            FlowPilot <span aria-hidden="true">·</span> Built for thoughtful engineering
+            FlowPilot
+            <span aria-hidden="true">·</span>
+            Built for thoughtful engineering
         </footer>
     </main>
+
+    <script src="{% static 'dashboard/flowpilot-ui.js' %}" defer></script>
 </body>
 </html>

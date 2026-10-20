@@ -1,0 +1,1513 @@
+/*
+ * FlowPilot UI — Phase 1 design system
+ * Load after dashboard.css.
+ */
+
+:root {
+  color-scheme: light;
+
+  --color-canvas: #f5f5f7;
+  --color-surface: #ffffff;
+  --color-surface-secondary: #f8f8fa;
+  --color-surface-hover: #eeeeF3;
+  --color-sidebar: rgb(251 251 253 / 92%);
+
+  --color-text: #1d1d1f;
+  --color-text-secondary: #626269;
+  --color-text-tertiary: #86868b;
+  --color-text-inverse: #ffffff;
+
+  --color-border: #e2e2e7;
+  --color-border-strong: #c9c9d0;
+
+  --color-accent: #0071e3;
+  --color-accent-hover: #0077ed;
+  --color-accent-active: #006edb;
+  --color-accent-soft: #e7f1ff;
+  --color-focus: rgb(0 113 227 / 42%);
+
+  --color-success: #248a3d;
+  --color-success-soft: #e6f6e9;
+  --color-warning: #946200;
+  --color-warning-soft: #fff2d2;
+  --color-danger: #c9342d;
+  --color-danger-soft: #ffedeb;
+
+  --color-purple: #8944d5;
+  --color-purple-soft: #f2eaff;
+  --color-pink: #d72d7a;
+  --color-pink-soft: #ffebf4;
+  --color-teal: #087e8b;
+  --color-teal-soft: #e2f7f8;
+
+  --sidebar-width: 252px;
+  --content-max-width: 1400px;
+
+  --radius-small: 9px;
+  --radius-medium: 14px;
+  --radius-large: 20px;
+  --radius-panel: 26px;
+
+  --shadow-panel:
+    0 1px 2px rgb(0 0 0 / 3%),
+    0 8px 24px rgb(0 0 0 / 2%);
+
+  --shadow-floating:
+    0 16px 44px rgb(0 0 0 / 10%),
+    0 3px 10px rgb(0 0 0 / 4%);
+
+  --transition-fast: 150ms ease;
+  --transition-standard: 220ms cubic-bezier(.2, .7, .3, 1);
+  --transition-gentle: 300ms cubic-bezier(.2, .7, .3, 1);
+}
+
+/* Dark theme */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --color-canvas: #111113;
+  --color-surface: #1c1c1e;
+  --color-surface-secondary: #242426;
+  --color-surface-hover: #303034;
+  --color-sidebar: rgb(28 28 30 / 92%);
+
+  --color-text: #f5f5f7;
+  --color-text-secondary: #b5b5bb;
+  --color-text-tertiary: #929298;
+  --color-text-inverse: #ffffff;
+
+  --color-border: #38383d;
+  --color-border-strong: #505057;
+
+  --color-accent: #2997ff;
+  --color-accent-hover: #48a5ff;
+  --color-accent-active: #1688f8;
+  --color-accent-soft: #173654;
+  --color-focus: rgb(41 151 255 / 48%);
+
+  --color-success: #55d875;
+  --color-success-soft: #183a25;
+  --color-warning: #ffd166;
+  --color-warning-soft: #40351a;
+  --color-danger: #ff6961;
+  --color-danger-soft: #482321;
+
+  --color-purple: #c49aff;
+  --color-purple-soft: #332343;
+  --color-pink: #ff7eb6;
+  --color-pink-soft: #432338;
+  --color-teal: #62d9e2;
+  --color-teal-soft: #173a3d;
+
+  --shadow-panel:
+    0 1px 2px rgb(0 0 0 / 18%),
+    0 8px 28px rgb(0 0 0 / 12%);
+
+  --shadow-floating: 0 18px 48px rgb(0 0 0 / 35%);
+}
+
+/* Global foundations */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 88px;
+}
+
+body {
+  color: var(--color-text);
+  background: var(--color-canvas);
+  transition:
+    background var(--transition-standard),
+    color var(--transition-standard);
+}
+
+::selection {
+  color: var(--color-text);
+  background: var(--color-accent-soft);
+}
+
+a {
+  text-underline-offset: 3px;
+}
+
+button,
+input,
+select,
+textarea {
+  accent-color: var(--color-accent);
+}
+
+:focus-visible {
+  outline-color: var(--color-focus) !important;
+}
+
+/* Brand */
+.brand-mark {
+  color: #ffffff;
+  background: linear-gradient(
+    145deg,
+    #2997ff 0%,
+    #0071e3 58%,
+    #5e5ce6 100%
+  );
+  box-shadow: 0 4px 12px rgb(0 113 227 / 22%);
+}
+
+/* Navigation and shell */
+.sidebar {
+  border-color: var(--color-border);
+  background: var(--color-sidebar);
+}
+
+.nav-link:hover {
+  color: var(--color-text);
+  background: var(--color-surface-hover);
+}
+
+.nav-link-active {
+  color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+.topbar {
+  border-color: var(--color-border);
+  background: color-mix(
+    in srgb,
+    var(--color-canvas) 88%,
+    transparent
+  );
+}
+
+.page-content {
+  padding-bottom: 36px;
+}
+
+/* Page typography */
+.page-intro h1,
+.auth-panel h1 {
+  text-wrap: balance;
+}
+
+.page-description,
+.auth-description {
+  text-wrap: pretty;
+}
+
+/* Cards and panels */
+.metric-card,
+.table-shell,
+.detail-panel,
+.finding-card,
+.diagnostic-card,
+.empty-state {
+  border-color: var(--color-border);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-panel);
+}
+
+.metric-card:hover {
+  border-color: var(--color-border-strong);
+}
+
+/* Tables */
+.data-table thead {
+  background: var(--color-surface-secondary);
+}
+
+.data-table td {
+  border-color: var(--color-border);
+}
+
+.data-table tbody tr:hover {
+  background: var(--color-surface-hover);
+}
+
+.repo-mark,
+.branch-label,
+.empty-state-icon {
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+  background: var(--color-surface-secondary);
+}
+
+/* Status indicators */
+.status-success {
+  border-color: color-mix(
+    in srgb,
+    var(--color-success) 22%,
+    transparent
+  );
+}
+
+.status-error {
+  border-color: color-mix(
+    in srgb,
+    var(--color-danger) 22%,
+    transparent
+  );
+}
+
+.status-warning {
+  border-color: color-mix(
+    in srgb,
+    var(--color-warning) 22%,
+    transparent
+  );
+}
+
+.status-running {
+  border-color: color-mix(
+    in srgb,
+    var(--color-accent) 24%,
+    transparent
+  );
+}
+
+.status-neutral {
+  background: var(--color-surface-secondary);
+}
+
+.recommendation {
+  background: var(--color-surface-secondary);
+}
+
+.error-panel {
+  border-color: var(--color-danger);
+  background: var(--color-danger-soft);
+}
+
+/* Authentication pages */
+.auth-page {
+  background:
+    radial-gradient(
+      ellipse at 50% 24%,
+      color-mix(in srgb, var(--color-accent) 10%, transparent),
+      transparent 56%
+    ),
+    var(--color-canvas);
+}
+
+.auth-form input {
+  border-color: var(--color-border-strong);
+  color: var(--color-text);
+  background: var(--color-surface);
+}
+
+.button-primary {
+  background: var(--color-accent);
+}
+
+.button-primary:hover {
+  background: var(--color-accent-hover);
+}
+
+.button:focus-visible,
+.nav-link:focus-visible,
+.theme-toggle:focus-visible,
+.menu-toggle:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+/* Theme and mobile navigation controls */
+.shell-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.theme-toggle,
+.menu-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 40px;
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  color: var(--color-text-secondary);
+  background: var(--color-surface);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.theme-toggle:hover,
+.menu-toggle:hover {
+  color: var(--color-text);
+  border-color: var(--color-border-strong);
+  background: var(--color-surface-hover);
+}
+
+.theme-toggle:active,
+.menu-toggle:active {
+  transform: scale(.97);
+}
+
+.theme-toggle svg,
+.menu-toggle svg {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+}
+
+.menu-toggle {
+  display: none;
+}
+
+/* Mobile navigation */
+@media (max-width: 760px) {
+  .sidebar {
+    z-index: 20;
+  }
+
+  .sidebar .main-nav {
+    position: fixed;
+    z-index: 25;
+    top: 60px;
+    right: 12px;
+    left: 12px;
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    padding: 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 18px;
+    background: var(--color-surface);
+    box-shadow: var(--shadow-floating);
+  }
+
+  .sidebar .main-nav.is-open {
+    display: flex;
+  }
+
+  .sidebar .main-nav .nav-link {
+    min-height: 46px;
+  }
+
+  .menu-toggle {
+    display: inline-flex;
+  }
+
+  .sidebar-bottom {
+    margin-left: auto;
+  }
+
+  .shell-actions {
+    gap: 7px;
+  }
+
+  .theme-toggle {
+    width: 38px;
+    min-width: 38px;
+    padding: 0;
+  }
+
+  .theme-toggle .theme-toggle-label {
+    display: none;
+  }
+
+  .topbar {
+    gap: 10px;
+  }
+}
+
+@media (max-width: 420px) {
+  .topbar {
+    padding-right: 14px;
+    padding-left: 14px;
+  }
+
+  .breadcrumb {
+    min-width: 0;
+    gap: 6px;
+    font-size: 11px;
+  }
+
+  .shell-actions {
+    gap: 5px;
+  }
+}
+
+/* Respect system accessibility preferences */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+/* Restrained form controls */
+.auth-form select,
+.auth-form input,
+.auth-form textarea {
+  width: 100%;
+  min-height: 46px;
+  padding: 11px 14px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 12px;
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.4;
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background-color var(--transition-fast);
+}
+
+.auth-form select {
+  cursor: pointer;
+}
+
+.auth-form select:hover,
+.auth-form input:hover,
+.auth-form textarea:hover {
+  border-color: var(--color-text-tertiary);
+}
+
+.auth-form select:focus-visible,
+.auth-form input:focus-visible,
+.auth-form textarea:focus-visible {
+  border-color: var(--color-accent);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-focus);
+}
+
+.auth-form option {
+  color: var(--color-text);
+  background: var(--color-surface);
+}
+
+.auth-form label {
+  display: block;
+  margin-top: 8px;
+  color: var(--color-text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.auth-form .button {
+  width: 100%;
+  margin-top: 12px;
+}
+
+/* Less prominent navigation selection */
+.nav-link-active {
+  color: var(--color-text);
+  background: var(--color-surface-hover);
+  font-weight: 650;
+}
+
+:root[data-theme="dark"] .nav-link-active {
+  color: var(--color-text);
+  background: #303034;
+}
+
+/* Use blue for actions and links, not every selected surface */
+.button-primary {
+  color: #ffffff;
+  background: #0071e3;
+}
+
+:root[data-theme="dark"] .button-primary {
+  background: #2997ff;
+}
+
+/* Make clickable metric cards behave like links */
+.metric-card-link {
+  display: flex;
+  color: inherit;
+  text-decoration: none;
+  border-radius: var(--radius-large);
+}
+
+.metric-card-link .metric-card {
+  width: 100%;
+}
+
+.metric-card-link:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 4px;
+}
+
+/* ==========================================================
+   FlowPilot refinement — calm surfaces, navigation and motion
+   ========================================================== */
+
+:root {
+  --color-accent: #52677d;
+  --color-accent-hover: #43596f;
+  --color-accent-active: #374b60;
+  --color-accent-soft: #e9edf1;
+  --color-focus: rgb(82 103 125 / 30%);
+
+  --sidebar-expanded-width: 252px;
+  --sidebar-collapsed-width: 76px;
+
+  --transition-fast: 160ms ease;
+  --transition-standard: 220ms cubic-bezier(.2, .65, .3, 1);
+  --transition-gentle: 280ms cubic-bezier(.2, .65, .3, 1);
+}
+
+:root[data-theme="dark"] {
+  --color-accent: #a8bacb;
+  --color-accent-hover: #c0cfdd;
+  --color-accent-active: #d0dbe5;
+  --color-accent-soft: #2a3036;
+  --color-focus: rgb(168 186 203 / 35%);
+}
+
+/* Avoid a strong blue glow on authentication pages. */
+.auth-page {
+  background: var(--color-canvas);
+}
+
+:root[data-theme="dark"] .auth-page {
+  background: #141416;
+}
+
+/* Use a restrained brand mark instead of a bright gradient. */
+.brand-mark {
+  background: #46586b;
+  box-shadow: none;
+}
+
+:root[data-theme="dark"] .brand-mark {
+  color: #17191c;
+  background: #b8c4d0;
+}
+
+/* Navigation active state: quiet neutral surface. */
+.nav-link-active,
+.nav-link-active:hover {
+  color: var(--color-text);
+  background: var(--color-surface-hover);
+}
+
+:root[data-theme="dark"] .nav-link-active,
+:root[data-theme="dark"] .nav-link-active:hover {
+  color: var(--color-text);
+  background: #303034;
+}
+
+/* Subdued, consistent button treatment. */
+.button-primary {
+  background: #52677d;
+  box-shadow: none;
+}
+
+.button-primary:hover {
+  background: #43596f;
+  box-shadow: none;
+}
+
+:root[data-theme="dark"] .button-primary {
+  color: #17191c;
+  background: #b8c4d0;
+}
+
+:root[data-theme="dark"] .button-primary:hover {
+  background: #cbd5df;
+}
+
+/* Keep motion subtle and consistent. */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 82px;
+}
+
+body,
+.sidebar,
+.main-content,
+.topbar,
+.metric-card,
+.table-shell,
+.detail-panel,
+.finding-card,
+.diagnostic-card,
+.empty-state,
+.nav-link,
+.button,
+.theme-toggle,
+.menu-toggle {
+  transition:
+    background-color var(--transition-standard),
+    border-color var(--transition-standard),
+    color var(--transition-standard),
+    box-shadow var(--transition-standard);
+}
+
+.metric-card:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-panel);
+}
+
+.metric-card-link .metric-card:hover {
+  border-color: var(--color-border-strong);
+}
+
+.data-table tbody tr:hover {
+  background: var(--color-surface-secondary);
+}
+
+/* Desktop sidebar toggle. */
+.menu-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  color: var(--color-text-secondary);
+  background: var(--color-surface);
+  cursor: pointer;
+}
+
+.menu-toggle:hover {
+  color: var(--color-text);
+  background: var(--color-surface-hover);
+}
+
+.menu-toggle svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Keep topbar controls aligned. */
+.shell-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 13px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  color: var(--color-text-secondary);
+  background: var(--color-surface);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.theme-toggle svg {
+  width: 17px;
+  height: 17px;
+}
+
+/* Desktop collapsed state. */
+@media (min-width: 761px) {
+  .app-page.sidebar-collapsed .sidebar {
+    width: var(--sidebar-collapsed-width);
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .app-page.sidebar-collapsed .sidebar > .brand {
+    justify-content: center;
+    width: 100%;
+    margin-right: 0;
+    margin-left: 0;
+  }
+
+  .app-page.sidebar-collapsed .sidebar > .brand > span:last-child,
+  .app-page.sidebar-collapsed .nav-heading,
+  .app-page.sidebar-collapsed .nav-link:not(.logout-button) {
+    font-size: 0;
+  }
+
+  .app-page.sidebar-collapsed .nav-link {
+    justify-content: center;
+    gap: 0;
+    padding: 0;
+  }
+
+  .app-page.sidebar-collapsed .nav-icon {
+    width: 22px;
+    font-size: 17px;
+  }
+
+  .app-page.sidebar-collapsed .account-card {
+    justify-content: center;
+    padding-right: 0;
+    padding-left: 0;
+  }
+
+  .app-page.sidebar-collapsed .account-details {
+    display: none;
+  }
+
+  .app-page.sidebar-collapsed .logout-button {
+    justify-content: center;
+    gap: 0;
+    overflow: hidden;
+    font-size: 0;
+  }
+
+  .app-page.sidebar-collapsed .logout-button .nav-icon {
+    display: inline-grid;
+  }
+
+  .app-page.sidebar-collapsed .main-content {
+    margin-left: var(--sidebar-collapsed-width);
+  }
+
+  .app-page .sidebar,
+  .app-page .main-content {
+    transition:
+      width var(--transition-gentle),
+      margin-left var(--transition-gentle);
+  }
+}
+
+/* Mobile drawer: fixed menu with a subdued backdrop. */
+.mobile-nav-backdrop {
+  position: fixed;
+  z-index: 18;
+  inset: 0;
+  border: 0;
+  background: rgb(0 0 0 / 24%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-standard);
+}
+
+.mobile-nav-backdrop.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (max-width: 760px) {
+  .app-page {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .app-page .sidebar {
+    position: sticky;
+    z-index: 20;
+    inset: 0 0 auto;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: 60px;
+    min-height: 60px;
+    padding: 0 16px;
+    border-right: 0;
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-sidebar);
+  }
+
+  .app-page .sidebar > .brand {
+    margin: 0;
+  }
+
+  .app-page .sidebar > .brand > span:last-child {
+    font-size: 17px;
+  }
+
+  .app-page .nav-heading {
+    display: none;
+  }
+
+  .app-page .sidebar .main-nav {
+    position: fixed;
+    z-index: 21;
+    top: 70px;
+    right: 12px;
+    left: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px;
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    background: var(--color-surface);
+    box-shadow: var(--shadow-floating);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(-5px);
+    transition:
+      opacity var(--transition-standard),
+      transform var(--transition-standard),
+      visibility var(--transition-standard);
+  }
+
+  .app-page .sidebar .main-nav.is-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  .app-page .sidebar .main-nav .nav-link {
+    justify-content: flex-start;
+    gap: 12px;
+    min-height: 44px;
+    padding: 0 12px;
+    font-size: 13px;
+  }
+
+  .app-page .sidebar .main-nav .nav-icon {
+    width: 19px;
+  }
+
+  .app-page .sidebar-bottom {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+  }
+
+  .app-page .account-card {
+    padding: 0;
+    border: 0;
+  }
+
+  .app-page .account-details {
+    display: none;
+  }
+
+  .app-page .logout-button {
+    width: auto;
+    min-height: 36px;
+    padding: 0 8px;
+    font-size: 11px;
+  }
+
+  .app-page .logout-button .nav-icon {
+    display: none;
+  }
+
+  .app-page .main-content {
+    min-width: 0;
+    margin-left: 0;
+  }
+
+  .app-page .topbar {
+    position: sticky;
+    z-index: 10;
+    top: 60px;
+    gap: 8px;
+    min-height: 54px;
+    padding: 0 16px;
+  }
+
+  .shell-actions {
+    gap: 6px;
+  }
+
+  .theme-toggle {
+    width: 40px;
+    min-width: 40px;
+    padding: 0;
+  }
+
+  .theme-toggle .theme-toggle-label {
+    display: none;
+  }
+}
+
+@media (max-width: 420px) {
+  .app-page .topbar {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .breadcrumb {
+    min-width: 0;
+    gap: 6px;
+    font-size: 11px;
+  }
+
+  .connection-label {
+    display: none;
+  }
+}
+
+/* Accessible motion settings. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
+/* ==========================================================
+   Repository Access — refined form design
+   ========================================================== */
+
+.repository-access-page .page-content {
+  max-width: 1180px;
+  margin-inline: auto;
+}
+
+.repository-access-page .page-intro {
+  margin-bottom: 34px;
+}
+
+.repository-access-page .page-intro h1 {
+  max-width: 720px;
+  margin-bottom: 10px;
+  font-size: clamp(30px, 3.2vw, 44px);
+  font-weight: 650;
+  letter-spacing: -0.045em;
+  line-height: 1.08;
+}
+
+.repository-access-page .page-description {
+  max-width: 620px;
+  color: var(--color-text-secondary);
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.repository-access-page .content-section {
+  margin-top: 36px;
+}
+
+.repository-access-page .section-heading {
+  align-items: end;
+  margin-bottom: 16px;
+}
+
+.repository-access-page .section-heading h2 {
+  margin: 0;
+  font-size: 23px;
+  font-weight: 620;
+  letter-spacing: -0.035em;
+}
+
+.repository-access-page .access-form-panel {
+  padding: clamp(20px, 3vw, 32px);
+  border: 1px solid var(--color-border);
+  border-radius: 22px;
+  background: var(--color-surface);
+  box-shadow: 0 4px 18px rgb(0 0 0 / 3%);
+}
+
+.repository-access-page .access-form-intro {
+  margin: 0 0 24px;
+}
+
+.repository-access-page .access-form-intro h3 {
+  margin: 0 0 7px;
+  font-size: 17px;
+  font-weight: 620;
+  letter-spacing: -0.02em;
+}
+
+.repository-access-page .access-form-intro p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.repository-access-page .auth-form {
+  display: grid;
+  gap: 9px;
+}
+
+.repository-access-page .auth-form label {
+  margin: 12px 0 1px;
+  color: var(--color-text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.repository-access-page .auth-form select,
+.repository-access-page .auth-form input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 48px;
+  padding: 0 42px 0 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  color: var(--color-text);
+  background-color: var(--color-surface-secondary);
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.4;
+  box-shadow: none;
+  transition:
+    background-color var(--transition-standard),
+    border-color var(--transition-standard),
+    box-shadow var(--transition-standard);
+}
+
+.repository-access-page .auth-form select {
+  cursor: pointer;
+}
+
+.repository-access-page .auth-form select:hover,
+.repository-access-page .auth-form input:hover {
+  border-color: var(--color-border-strong);
+  background-color: var(--color-surface);
+}
+
+.repository-access-page .auth-form select:focus-visible,
+.repository-access-page .auth-form input:focus-visible {
+  border-color: var(--color-accent);
+  outline: none;
+  background-color: var(--color-surface);
+  box-shadow: 0 0 0 3px var(--color-focus);
+}
+
+.repository-access-page .auth-form option {
+  color: var(--color-text);
+  background: var(--color-surface);
+}
+
+/* Save action: understated, with a clear interactive state. */
+.repository-access-page .auth-form .button,
+.repository-access-page .auth-form button[type="submit"] {
+  justify-self: start;
+  width: auto;
+  min-width: 190px;
+  min-height: 44px;
+  margin-top: 18px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 999px;
+  color: #ffffff;
+  background: #52677d;
+  box-shadow: none;
+  font-size: 13px;
+  font-weight: 600;
+  transition:
+    background-color var(--transition-standard),
+    transform var(--transition-fast);
+}
+
+.repository-access-page .auth-form .button:hover,
+.repository-access-page .auth-form button[type="submit"]:hover {
+  background: #43596f;
+}
+
+.repository-access-page .auth-form .button:active,
+.repository-access-page .auth-form button[type="submit"]:active {
+  transform: scale(.985);
+}
+
+:root[data-theme="dark"] .repository-access-page
+.auth-form .button,
+:root[data-theme="dark"] .repository-access-page
+.auth-form button[type="submit"] {
+  color: #17191c;
+  background: #b8c4d0;
+}
+
+:root[data-theme="dark"] .repository-access-page
+.auth-form .button:hover,
+:root[data-theme="dark"] .repository-access-page
+.auth-form button[type="submit"]:hover {
+  background: #cbd5df;
+}
+
+/* Membership table */
+.repository-access-page .table-shell {
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  background: var(--color-surface);
+  box-shadow: none;
+}
+
+.repository-access-page .data-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.repository-access-page .data-table th {
+  padding: 15px 20px;
+  color: var(--color-text-secondary);
+  background: var(--color-surface-secondary);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .025em;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.repository-access-page .data-table td {
+  padding: 18px 20px;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-size: 13px;
+  vertical-align: middle;
+}
+
+.repository-access-page .data-table tbody tr:hover {
+  background: var(--color-surface-secondary);
+}
+
+/* Make destructive actions clear without making them shout. */
+.repository-access-page .button-danger,
+.repository-access-page button.danger-button {
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  color: var(--color-danger);
+  background: transparent;
+  box-shadow: none;
+}
+
+.repository-access-page .button-danger:hover,
+.repository-access-page button.danger-button:hover {
+  border-color: var(--color-danger);
+  background: var(--color-danger-soft);
+}
+
+@media (max-width: 640px) {
+  .repository-access-page .access-form-panel {
+    padding: 18px;
+    border-radius: 17px;
+  }
+
+  .repository-access-page .auth-form .button,
+  .repository-access-page .auth-form button[type="submit"] {
+    width: 100%;
+  }
+
+  .repository-access-page .data-table th,
+  .repository-access-page .data-table td {
+    padding: 13px 14px;
+  }
+}
+
+
+
+/* ==========================================================
+   FlowPilot — repository identity and form alignment fixes
+   ========================================================== */
+
+/* Repository identity in the overview table */
+.repository-access-page .membership-repository,
+.repository-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.repository-access-page .membership-repository .repo-mark,
+.repository-cell .repo-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  box-sizing: border-box;
+  border: 1px solid var(--color-border);
+  border-radius: 11px;
+  color: var(--color-text-secondary);
+  background: var(--color-surface-secondary);
+}
+
+.repository-access-page .membership-repository .repo-mark svg,
+.repository-cell .repo-mark svg {
+  display: block;
+  width: 19px;
+  height: 19px;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Keep repository text from colliding with the icon. */
+.repository-access-page .membership-repository > span:last-child,
+.repository-cell .repository-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Form spacing: labels should sit clearly above controls. */
+.repository-access-page .access-form {
+  gap: 22px;
+}
+
+.repository-access-page .access-field {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 9px;
+  min-width: 0;
+}
+
+.repository-access-page .access-field label {
+  display: block;
+  margin: 0;
+  padding: 0;
+  line-height: 1.45;
+}
+
+.repository-access-page .access-field select {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0 42px 0 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  color: var(--color-text);
+  background-color: var(--color-surface-secondary);
+  font-family: inherit;
+  font-size: 14px;
+  line-height: normal;
+  cursor: pointer;
+}
+
+.repository-access-page .access-field .field-help {
+  margin: 0;
+  padding: 0;
+  line-height: 1.55;
+}
+
+/* Make the select focus state quiet and accessible. */
+.repository-access-page .access-field select:focus-visible {
+  border-color: var(--color-accent);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-focus);
+}
+
+/* Table rows should remain vertically centered. */
+.repository-access-page .data-table td {
+  vertical-align: middle;
+}
+
+.repository-access-page .data-table td form {
+  margin: 0;
+}
+
+/* Avoid an empty-looking icon by giving the repository mark a symbol. */
+.repository-access-page .repo-mark svg,
+.repository-cell .repo-mark svg {
+  fill: none;
+}
+
+/* Overview repository icon, if rendered by the shared dashboard template. */
+.repository-cell .repo-mark {
+  background: var(--color-surface-secondary);
+}
+
+@media (max-width: 640px) {
+  .repository-access-page .access-form {
+    gap: 20px;
+  }
+
+  .repository-access-page .membership-repository .repo-mark,
+  .repository-cell .repo-mark {
+    flex-basis: 32px;
+    width: 32px;
+    height: 32px;
+  }
+}
+
+
+
+/* Repository Access — prevent select text and native arrow overlap */
+.repository-access-page .access-field select {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+
+  padding: 0 44px 0 14px;
+  text-align: left;
+  text-indent: 0;
+  line-height: 1.4;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+
+/* ==========================================================
+   FlowPilot Spectrum theme
+   Multicolor accents with readable, neutral surfaces
+   ========================================================== */
+
+:root[data-theme="spectrum"] {
+  color-scheme: dark;
+
+  --color-text: #f5f5f7;
+  --color-text-secondary: #b8b8c2;
+  --color-text-tertiary: #888895;
+
+  --color-background: #14141b;
+  --color-surface: #1d1d27;
+  --color-surface-secondary: #252533;
+  --color-surface-hover: #303043;
+
+  --color-border: #39394b;
+  --color-border-strong: #55556d;
+
+  --color-accent: #bf8bff;
+  --color-accent-soft: rgb(191 139 255 / 15%);
+  --color-focus: rgb(191 139 255 / 32%);
+
+  --spectrum-red: #ff6961;
+  --spectrum-orange: #ffb454;
+  --spectrum-yellow: #f9df6d;
+  --spectrum-green: #52d99a;
+  --spectrum-blue: #64a8ff;
+  --spectrum-purple: #bf8bff;
+  --spectrum-pink: #ff8fc8;
+
+  --spectrum-gradient: linear-gradient(
+    110deg,
+    #ff6961 0%,
+    #ffb454 18%,
+    #f9df6d 34%,
+    #52d99a 50%,
+    #64a8ff 68%,
+    #bf8bff 84%,
+    #ff8fc8 100%
+  );
+}
+
+/* Use the existing design tokens for page surfaces. */
+:root[data-theme="spectrum"] body {
+  color: var(--color-text);
+  background: var(--color-background);
+}
+
+:root[data-theme="spectrum"] .sidebar {
+  background:
+    linear-gradient(180deg, rgb(191 139 255 / 5%), transparent 35%),
+    var(--color-surface);
+  border-color: var(--color-border);
+}
+
+:root[data-theme="spectrum"] .topbar {
+  background: rgb(20 20 27 / 92%);
+  border-color: var(--color-border);
+}
+
+:root[data-theme="spectrum"] .nav-link-active,
+:root[data-theme="spectrum"] .main-nav a[aria-current="page"] {
+  color: var(--color-text);
+  background:
+    linear-gradient(100deg, rgb(100 168 255 / 14%), rgb(191 139 255 / 13%));
+  box-shadow: inset 2px 0 0 var(--spectrum-purple);
+}
+
+:root[data-theme="spectrum"] .button-primary,
+:root[data-theme="spectrum"] .auth-form button[type="submit"] {
+  color: #17131e;
+  background: linear-gradient(110deg, #b6a0ff, #8dcaff 55%, #91e9c2);
+  border-color: transparent;
+}
+
+:root[data-theme="spectrum"] .button-primary:hover,
+:root[data-theme="spectrum"] .auth-form button[type="submit"]:hover {
+  filter: brightness(1.06);
+}
+
+:root[data-theme="spectrum"] .theme-toggle {
+  border-color: rgb(191 139 255 / 35%);
+  background:
+    linear-gradient(110deg, rgb(100 168 255 / 10%), rgb(191 139 255 / 12%)),
+    var(--color-surface);
+}
+
+:root[data-theme="spectrum"] .theme-toggle:focus-visible,
+:root[data-theme="spectrum"] .menu-toggle:focus-visible {
+  outline: 2px solid var(--spectrum-purple);
+  outline-offset: 3px;
+}
+
+/* Status colors retain consistent meaning. */
+:root[data-theme="spectrum"] .severity-high,
+:root[data-theme="spectrum"] .status-failed {
+  color: var(--spectrum-red);
+}
+
+:root[data-theme="spectrum"] .severity-medium,
+:root[data-theme="spectrum"] .status-pending {
+  color: var(--spectrum-orange);
+}
+
+:root[data-theme="spectrum"] .severity-low,
+:root[data-theme="spectrum"] .status-success {
+  color: var(--spectrum-green);
+}
+
+/* A restrained multicolor accent for section headings. */
+:root[data-theme="spectrum"] .page-intro h1 {
+  text-decoration-color: var(--spectrum-purple);
+  text-decoration-thickness: 3px;
+  text-underline-offset: 8px;
+}
+
+/* Preserve readable native form controls. */
+:root[data-theme="spectrum"] input,
+:root[data-theme="spectrum"] select,
+:root[data-theme="spectrum"] textarea {
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  border-color: var(--color-border);
+}
+
+:root[data-theme="spectrum"] select option {
+  color: var(--color-text);
+  background: var(--color-surface);
+}
+
+/* Honor reduced-motion preferences. */
+@media (prefers-reduced-motion: reduce) {
+  :root[data-theme="spectrum"] *,
+  :root[data-theme="spectrum"] *::before,
+  :root[data-theme="spectrum"] *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

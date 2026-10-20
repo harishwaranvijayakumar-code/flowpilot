@@ -1,11 +1,21 @@
 import os
 from pathlib import Path
 
+from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv(BASE_DIR / ".env")
+
+DEBUG = os.environ.get("DJANGO_DEBUG", "false").lower() == "true"
+
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "")
+if not SECRET_KEY:
+    if DEBUG:
+        SECRET_KEY = "local-development-only-insecure-key"
+    else:
+        raise ImproperlyConfigured("DJANGO_SECRET_KEY must be set when DEBUG is false.")
 
 GITHUB_WEBHOOK_SECRET = os.environ.get("GITHUB_WEBHOOK_SECRET", "")
 GITHUB_APP_ID = os.environ.get("GITHUB_APP_ID", "")
@@ -20,13 +30,6 @@ GITHUB_OAUTH_AUTHORIZE_URL = "https://github.com/login/oauth/authorize"
 GITHUB_OAUTH_TOKEN_URL = "https://github.com/login/oauth/access_token"
 GITHUB_OAUTH_USER_URL = "https://api.github.com/user"
 
-SECRET_KEY = os.environ.get(
-    "DJANGO_SECRET_KEY",
-    "development-only-key-change-before-deployment",
-)
-
-DEBUG = os.environ.get("DJANGO_DEBUG", "false").lower() == "true"
-
 ALLOWED_HOSTS = [
     host.strip()
     for host in os.environ.get(
@@ -34,6 +37,12 @@ ALLOWED_HOSTS = [
         "localhost,127.0.0.1",
     ).split(",")
     if host.strip()
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",")
+    if origin.strip()
 ]
 
 INSTALLED_APPS = [
@@ -87,12 +96,13 @@ if os.environ.get("DB_ENGINE", "sqlite").lower() == "postgres":
             "ENGINE": "django.db.backends.postgresql",
             "NAME": os.environ.get("POSTGRES_DB", "flowpilot"),
             "USER": os.environ.get("POSTGRES_USER", "flowpilot"),
-            "PASSWORD": os.environ.get("POSTGRES_PASSWORD", "flowpilot"),
+            "PASSWORD": os.environ.get("POSTGRES_PASSWORD", ""),
             "HOST": os.environ.get("POSTGRES_HOST", "localhost"),
             "PORT": os.environ.get("POSTGRES_PORT", "5432"),
             "CONN_MAX_AGE": 60,
             "OPTIONS": {
                 "connect_timeout": 5,
+                "sslmode": os.environ.get("POSTGRES_SSLMODE", "prefer"),
             },
         }
     }
@@ -111,13 +121,13 @@ AUTH_PASSWORD_VALIDATORS = [
         ),
     },
     {
-        "NAME": ("django.contrib.auth.password_validation.MinimumLengthValidator"),
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        "NAME": ("django.contrib.auth.password_validation.CommonPasswordValidator"),
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        "NAME": ("django.contrib.auth.password_validation.NumericPasswordValidator"),
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
@@ -134,7 +144,7 @@ STORAGES = {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
     "staticfiles": {
-        "BACKEND": ("whitenoise.storage.CompressedManifestStaticFilesStorage"),
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
 
@@ -143,3 +153,10 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = "DENY"
 SECURE_REFERRER_POLICY = "same-origin"
+
+if not DEBUG:
+    # Render terminates HTTPS at its proxy.
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True

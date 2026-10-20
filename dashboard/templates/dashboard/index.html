@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#f5f5f7">
+    <meta name="description" content="Repository activity and workflow analysis in FlowPilot.">
     <title>Overview - FlowPilot</title>
     <link rel="stylesheet" href="{% static 'dashboard/dashboard.css' %}">
 </head>
@@ -49,6 +50,22 @@
                 </span>
                 Pull requests
             </a>
+
+            {% if can_manage_repositories %}
+                <a
+                    class="nav-link"
+                    href="{% url 'dashboard:repository_access' %}"
+                >
+                    <span class="nav-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <circle cx="9" cy="8" r="3"></circle>
+                            <path d="M3.5 19a5.5 5.5 0 0 1 11 0"></path>
+                            <path d="M16 11h5M18.5 8.5v5"></path>
+                        </svg>
+                    </span>
+                    Repository access
+                </a>
+            {% endif %}
         </nav>
 
         <div class="sidebar-bottom">
@@ -59,7 +76,13 @@
 
                 <div class="account-details">
                     <span class="account-name">{{ request.user.username }}</span>
-                    <span class="account-role">Workspace member</span>
+                    <span class="account-role">
+                        {% if request.user.is_staff or request.user.is_superuser %}
+                            Administrator
+                        {% else %}
+                            Workspace member
+                        {% endif %}
+                    </span>
                 </div>
             </div>
 
@@ -99,7 +122,29 @@
                     A clear view of your repositories, pull request
                     analysis, and background activity.
                 </p>
+
+                {% if can_manage_repositories %}
+                    <p>
+                        <a
+                            class="analysis-link"
+                            href="{% url 'dashboard:repository_access' %}"
+                        >
+                            Manage repository access &rarr;
+                        </a>
+                    </p>
+                {% endif %}
             </section>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div
+                        class="notice {% if message.tags == 'error' %}notice-error{% endif %}"
+                        role="status"
+                    >
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
 
             <section class="metrics-grid" aria-label="Workspace summary">
                 <article class="metric-card">
@@ -222,9 +267,23 @@
                         <h3>Your workspace starts here.</h3>
                         <p>
                             No active repositories are assigned to your account yet.
-                            Ask your administrator to connect a repository and grant
-                            you access.
+                            {% if can_manage_repositories %}
+                                Use repository access management to assign an existing
+                                active repository to a user.
+                            {% else %}
+                                Ask a repository maintainer or administrator to grant
+                                you access.
+                            {% endif %}
                         </p>
+
+                        {% if can_manage_repositories %}
+                            <a
+                                class="analysis-link"
+                                href="{% url 'dashboard:repository_access' %}"
+                            >
+                                Manage repository access &rarr;
+                            </a>
+                        {% endif %}
                     </div>
                 {% endif %}
             </section>

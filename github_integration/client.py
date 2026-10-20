@@ -91,11 +91,64 @@ class GitHubAppClient:
         }
 
         try:
-            return jwt.encode(claims, self.private_key, algorithm="RS256")
+            return jwt.encode(
+                claims,
+                self.private_key,
+                algorithm="RS256",
+            )
         except (jwt.PyJWTError, ValueError, TypeError) as exc:
             raise GitHubConfigurationError(
                 "Could not sign the GitHub App JWT; check the private key."
             ) from exc
+
+    def get_installation(self, installation_id: int) -> dict[str, Any]:
+        """
+        Fetch the current installation state using the GitHub App JWT.
+
+        This endpoint is intentionally authenticated with the App JWT,
+        not an installation access token.
+        """
+        if (
+            isinstance(installation_id, bool)
+            or not isinstance(installation_id, int)
+            or installation_id <= 0
+        ):
+            raise GitHubConfigurationError(
+                "Installation ID must be a positive integer."
+            )
+
+        response = self._send(
+            "GET",
+            f"/app/installations/{installation_id}",
+            headers={
+                "Authorization": f"Bearer {self.create_app_jwt()}",
+                "Accept": "application/vnd.github+json",
+                "X-GitHub-Api-Version": GITHUB_API_VERSION,
+            },
+        )
+        self._raise_for_status(response)
+
+        try:
+            data = response.json()
+        except ValueError as exc:
+            raise GitHubResponseError(
+                "GitHub returned an invalid installation response."
+            ) from exc
+
+        if not isinstance(data, dict):
+            raise GitHubResponseError(
+                "GitHub returned an invalid installation response."
+            )
+
+        returned_id = data.get("id")
+        if (
+            isinstance(returned_id, bool)
+            or not isinstance(returned_id, int)
+            or returned_id != installation_id
+        ):
+            raise GitHubResponseError("GitHub returned an unexpected installation ID.")
+
+        return data
 
     def create_installation_token(self, installation_id: int) -> str:
         """Exchange the App JWT for a short-lived installation token."""
@@ -132,6 +185,97 @@ class GitHubAppClient:
 
         return token
 
+    def list_installation_repositories(
+        self,
+        installation_id: int,
+    ) -> list[dict[str, Any]]:
+        """List every repository accessible to an installation."""
+        if (
+            isinstance(installation_id, bool)
+            or not isinstance(installation_id, int)
+            or installation_id <= 0
+        ):
+            raise GitHubConfigurationError(
+                "Installation ID must be a positive integer."
+            )
+
+        repositories = []
+        page = 1
+        total_count = None
+
+        while total_count is None or len(repositories) < total_count:
+            data = self.request(
+                "GET",
+                "/installation/repositories",
+                installation_id=installation_id,
+                params={"per_page": 100, "page": page},
+            )
+
+            if not isinstance(data, dict):
+                raise GitHubResponseError(
+                    "GitHub returned an invalid repository-list response."
+                )
+
+            page_repositories = data.get("repositories")
+            page_total_count = data.get("total_count")
+
+            if (
+                isinstance(page_total_count, bool)
+                or not isinstance(page_total_count, int)
+                or page_total_count < 0
+                or not isinstance(page_repositories, list)
+            ):
+                raise GitHubResponseError(
+                    "GitHub returned an invalid repository-list response."
+                )
+
+            if total_count is None:
+                total_count = page_total_count
+            elif page_total_count != total_count:
+                raise GitHubResponseError(
+                    "GitHub repository count changed during pagination."
+                )
+
+            if not page_repositories and len(repositories) < total_count:
+                raise GitHubResponseError(
+                    "GitHub returned an incomplete repository list."
+                )
+
+            for repository in page_repositories:
+                if not isinstance(repository, dict):
+                    raise GitHubResponseError(
+                        "GitHub returned an invalid repository entry."
+                    )
+
+                repository_id = repository.get("id")
+                full_name = repository.get("full_name")
+                html_url = repository.get("html_url")
+
+                if (
+                    isinstance(repository_id, bool)
+                    or not isinstance(repository_id, int)
+                    or repository_id <= 0
+                    or not isinstance(full_name, str)
+                    or not full_name.strip()
+                    or len(full_name) > 255
+                    or not isinstance(html_url, str)
+                    or not html_url.startswith("https://")
+                ):
+                    raise GitHubResponseError(
+                        "GitHub returned an invalid repository entry."
+                    )
+
+                repositories.append(repository)
+
+            if len(repositories) > total_count:
+                raise GitHubResponseError(
+                    "GitHub returned more repositories than reported."
+                )
+
+            page += 1
+
+        return repositories
+
     def request(
         self,
         method: str,
@@ -166,7 +310,12 @@ class GitHubAppClient:
                 "GitHub returned a response that was not valid JSON."
             ) from exc
 
-    def _send(self, method: str, path: str, **kwargs: Any) -> httpx.Response:
+    def _send(
+        self,
+        method: str,
+        path: str,
+        **kwargs: Any,
+    ) -> httpx.Response:
         """Send a request without following redirects or exposing secrets."""
         if not path.startswith("/") or path.startswith("//"):
             raise GitHubConfigurationError(

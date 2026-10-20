@@ -110,7 +110,7 @@ class CheckRunPublisher:
         findings: list[dict[str, Any]],
         diagnostics: list[dict[str, Any]],
     ) -> dict[str, Any]:
-        repository = _repository_for_job(repository_id)
+        repository = _repository_for_job(installation_id, repository_id)
         repository_name = repository.full_name
         encoded_repository_name = quote(repository_name, safe="/")
         encoded_sha = quote(head_sha, safe="")

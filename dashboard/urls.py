@@ -12,4 +12,9 @@ urlpatterns = [
         views.analysis_detail,
         name="analysis_detail",
     ),
+    path(
+        "repositories/access/",
+        views.repository_access,
+        name="repository_access",
+    ),
 ]

@@ -1,0 +1,176 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Repository access — FlowPilot</title>
+    <link rel="stylesheet" href="{% static 'dashboard/dashboard.css' %}">
+</head>
+<body class="app-page">
+    <aside class="sidebar">
+        <a class="brand" href="{% url 'dashboard:index' %}">
+            <span class="brand-mark" aria-hidden="true">F</span>
+            <span>FlowPilot</span>
+        </a>
+
+        <p class="nav-heading">WORKSPACE</p>
+        <nav class="main-nav" aria-label="Main navigation">
+            <a class="nav-link" href="{% url 'dashboard:index' %}">Overview</a>
+            <a class="nav-link" href="{% url 'dashboard:pull_requests' %}">Pull requests</a>
+            <a class="nav-link nav-link-active"
+               href="{% url 'dashboard:repository_access' %}"
+               aria-current="page">Repository access</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <div class="account-card">
+                <span class="avatar" aria-hidden="true">
+                    {{ request.user.username|first|upper }}
+                </span>
+                <div class="account-details">
+                    <span class="account-name">{{ request.user.username }}</span>
+                    <span class="account-role">Access manager</span>
+                </div>
+            </div>
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button class="nav-link logout-button" type="submit">Sign out</button>
+            </form>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <div class="breadcrumb">
+                Workspace <span aria-hidden="true">/</span> Repository access
+            </div>
+            <span class="connection-label">Access control</span>
+        </header>
+
+        <div class="page-content">
+            <section class="page-intro">
+                <p class="eyebrow">WORKSPACE ADMINISTRATION</p>
+                <h1>Repository access</h1>
+                <p class="page-description">
+                    Grant or revoke access to repositories already synchronized
+                    from your GitHub App installation.
+                </p>
+            </section>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="notice {% if message.tags == 'error' %}notice-error{% endif %}"
+                         role="status">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <section class="content-section">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">MEMBERSHIPS</p>
+                        <h2>Grant repository access</h2>
+                    </div>
+                </div>
+
+                <div class="detail-panel">
+                    <form method="post" class="auth-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="grant">
+
+                        <label for="grant-repository">Repository</label>
+                        <select id="grant-repository" name="repository_id" required>
+                            {% for repository in repositories %}
+                                <option value="{{ repository.pk }}">
+                                    {{ repository.full_name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+
+                        <label for="grant-user">User</label>
+                        <select id="grant-user" name="user_id" required>
+                            {% for user in users %}
+                                <option value="{{ user.pk }}">
+                                    {{ user.get_username }}
+                                </option>
+                            {% endfor %}
+                        </select>
+
+                        <label for="grant-role">Role</label>
+                        <select id="grant-role" name="role" required>
+                            {% for value, label in role_choices %}
+                                <option value="{{ value }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+
+                        <button class="button button-primary" type="submit">
+                            Save membership
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">CURRENT ACCESS</p>
+                        <h2>Repository memberships</h2>
+                    </div>
+                    <span class="section-count">{{ memberships|length }} memberships</span>
+                </div>
+
+                {% if memberships %}
+                    <div class="table-shell">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Repository</th>
+                                    <th scope="col">User</th>
+                                    <th scope="col">Role</th>
+                                    <th scope="col">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for membership in memberships %}
+                                    <tr>
+                                        <td>{{ membership.repository.full_name }}</td>
+                                        <td>{{ membership.user.get_username }}</td>
+                                        <td>{{ membership.get_role_display }}</td>
+                                        <td>
+                                            <form method="post">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="action" value="revoke">
+                                                <input type="hidden"
+                                                       name="repository_id"
+                                                       value="{{ membership.repository_id }}">
+                                                <input type="hidden"
+                                                       name="user_id"
+                                                       value="{{ membership.user_id }}">
+                                                <button class="button" type="submit">
+                                                    Revoke
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <h3>No memberships yet.</h3>
+                        <p>Grant access using the form above.</p>
+                    </div>
+                {% endif %}
+            </section>
+
+            <footer class="page-footer">
+                <a href="{% url 'dashboard:index' %}">Back to overview</a>
+            </footer>
+        </div>
+    </main>
+</body>
+</html>

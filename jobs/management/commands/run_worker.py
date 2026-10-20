@@ -4,6 +4,10 @@ import threading
 
 from django.core.management.base import BaseCommand, CommandError
 
+from github_integration.services import (
+    reconcile_installation,
+    sync_installation_repositories,
+)
 from jobs.analysis_handler import WorkflowAnalysisOutput, analyze_workflow_payload
 from jobs.analysis_results import persist_workflow_result_and_complete
 from jobs.check_run_publishing import publish_check_run_payload
@@ -19,10 +23,85 @@ logger = logging.getLogger(__name__)
 
 DEFAULT_POLL_INTERVAL = 1.0
 
+
+def reconcile_installation_job(claim):
+    """Reconcile a GitHub installation for the claimed lifecycle generation."""
+    installation_id = claim.payload.get("installation_id")
+    lifecycle_generation = claim.payload.get("lifecycle_generation")
+
+    if (
+        isinstance(installation_id, bool)
+        or not isinstance(installation_id, int)
+        or installation_id <= 0
+    ):
+        raise ValueError("Invalid GitHub installation ID in reconciliation job.")
+
+    if (
+        isinstance(lifecycle_generation, bool)
+        or not isinstance(lifecycle_generation, int)
+        or lifecycle_generation < 0
+    ):
+        raise ValueError("Invalid lifecycle generation in reconciliation job.")
+
+    result = reconcile_installation(
+        installation_id=installation_id,
+        lifecycle_generation=lifecycle_generation,
+    )
+
+    if result.stale:
+        logger.info(
+            "Skipped stale reconciliation job for installation %s at generation %s",
+            installation_id,
+            lifecycle_generation,
+        )
+    else:
+        logger.info(
+            "Reconciled installation %s at generation %s: status=%s",
+            installation_id,
+            lifecycle_generation,
+            result.status,
+        )
+
+    return result
+
+
+def sync_installation_job(claim):
+    """
+    Compatibility handler for existing queued repository-sync jobs.
+
+    New lifecycle webhooks should use reconcile_installation instead.
+    """
+    from github_integration.models import GitHubInstallation
+
+    installation_id = claim.payload.get("installation_id")
+
+    if (
+        isinstance(installation_id, bool)
+        or not isinstance(installation_id, int)
+        or installation_id <= 0
+    ):
+        raise ValueError("Invalid GitHub installation ID in sync job.")
+
+    installation = GitHubInstallation.objects.get(
+        installation_id=installation_id,
+    )
+
+    if installation.status != GitHubInstallation.Status.ACTIVE:
+        logger.info(
+            "Skipping repository sync for inactive installation %s",
+            installation_id,
+        )
+        return
+
+    sync_installation_repositories(installation)
+
+
 JOB_HANDLERS = {
     "workflow_analysis": lambda claim: analyze_workflow_payload(claim.payload),
     "analyze_pull_request": lambda claim: analyze_pull_request_payload(claim.payload),
     "publish_check_run": lambda claim: publish_check_run_payload(claim.payload),
+    "sync_installation_repositories": sync_installation_job,
+    "reconcile_installation": reconcile_installation_job,
 }
 
 

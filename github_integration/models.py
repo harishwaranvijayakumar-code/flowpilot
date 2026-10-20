@@ -66,6 +66,14 @@ class GitHubInstallation(models.Model):
         choices=Status.choices,
         default=Status.ACTIVE,
     )
+    last_lifecycle_event_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text=(
+            "Timestamp of the latest applied GitHub installation lifecycle event."
+        ),
+    )
+    lifecycle_generation = models.PositiveBigIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
